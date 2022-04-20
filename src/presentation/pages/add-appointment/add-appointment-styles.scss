@@ -1,0 +1,57 @@
+@import "../../styles/colors.scss";
+
+
+.root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.headerBase {
+  width: 100%;
+  background-color: $primary;
+  box-shadow: $primaryLight 0px 1px 5px 0px;
+  z-index: 998;
+  position: sticky;
+  top: 0;
+}
+
+.footerBase {
+  width: 100%;
+  background-color: $background;
+  z-index: 997;
+}
+
+.centerBase {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 60%;
+  flex: 1;
+  margin: auto;
+
+}
+
+.boxContainer {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  border-radius: 10px;
+  text-align: center;
+  padding-bottom: 3rem;
+}
+
+.addTitle {
+  color: $primary;
+  text-transform: uppercase;
+  margin-top: 2rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: 20px;
+  margin-bottom: 3rem;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  margin: 0 1rem 2rem;
+}

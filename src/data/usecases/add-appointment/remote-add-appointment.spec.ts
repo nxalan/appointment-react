@@ -5,7 +5,7 @@ import faker from '@faker-js/faker'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { AddAppointmentParams } from '@/domain/usecases'
 import { CreateAppointmentResponseModel } from '@/domain/models'
-import { mockAppointmentModel, mockAddAppointmentParams } from '@/domain/test'
+import { mockAddAppointmentModel, mockAddAppointmentParams } from '@/domain/test'
 
 type SutTypes = {
   sut: RemoteAddAppointment
@@ -65,7 +65,7 @@ describe('RemoteAuthentication', () => {
 
   test('Should return an AppointmentModel if HttpPostClient returns 200', async () => {
     const { sut, httpPostClientSpy } = makeSut()
-    const httpResult = mockAppointmentModel()
+    const httpResult = mockAddAppointmentModel()
     httpPostClientSpy.response = {
       statusCode: HttpStatusCode.ok,
       body: httpResult
