@@ -1,46 +1,72 @@
-import React, { useContext, useRef } from 'react'
+import React from 'react'
 import Styles from './input-styles.scss'
-import Context from '@/presentation/contexts/form/form-context'
+import { TextField } from '@mui/material';
+import { registerLocale } from "react-datepicker";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import pt from "date-fns/locale/pt"
 
-type Props = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
+type Props = { [key: string]: any }
 
-const Input: React.FC<Props> = (props: Props & { name: string } & {placeholder: string}) => {
-  const { state, setState } = useContext(Context)
-  const inputRef = useRef<HTMLInputElement>()
-  const error = state[`${props.name}Error`]
-
-  const handleChange = (event: React.FocusEvent<HTMLInputElement>): void => {
-    setState((prevState) => ({
-      ...prevState,
-      [event.target.name]: event.target.value
-    }))
-  }
-
+const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
+  registerLocale("pt", pt);
+  const componentType = props.inputType
+  delete props.inputType;
   return (
-    <div
-      data-testid={`${props.name}-wrap`}
-      className={Styles.inputWrap}
-      data-status={error ? 'invalid' : 'valid'}
-    >
-      <input
-        {...props}
-        ref={inputRef}
-        placeholder=" "
-        title={error}
-        data-testid={props.name}
-        readOnly
-        onFocus={e => { e.target.readOnly = false }}
-        onChange={handleChange}
-      />
-      <label
-        data-testid={`${props.name}-label`}
-        onClick={() => { inputRef.current.focus() }}
-        title={error}
-      >
-        {props.placeholder}
-      </label>
-    </div>
+    <>
+      {componentType === 'text' && (
+        <div className={Styles.textField}>
+          <TextField
+            variant="outlined"
+            fullWidth
+            type={props.type}
+            {...props}
+          />
+        </div>
+      )}
+
+      {componentType === 'date' && (
+        <div className={Styles.dateField}>
+          <LocalizationProvider locale={pt} dateAdapter={AdapterDateFns}>
+            <DatePicker
+              label={props.label}
+              value={props.value}
+              onChange={props.onChange}
+              {...props}
+              renderInput={(params) =>
+                <TextField
+                  {...params}
+                  required={props.required}
+                  fullWidth
+                />}
+            />
+          </LocalizationProvider>
+        </div>
+      )}
+
+      {componentType === 'dateTime' && (
+        <div className={Styles.dateField}>
+          <LocalizationProvider locale={pt} dateAdapter={AdapterDateFns}>
+            <DateTimePicker
+              label={props.label}
+              value={props.value}
+              onChange={props.onChange}
+              {...props}
+              renderInput={(params) =>
+                <TextField
+                {...params}
+                fullWidth
+                required={props.required}
+                />}
+            />
+          </LocalizationProvider>
+        </div>
+      )}
+
+    </>
   )
 }
 
-export default (Input)
+export default (InputText)
