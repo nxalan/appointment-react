@@ -5,7 +5,7 @@ import Styles from './add-appointment-styles.scss'
 import { Footer, Header, Input, SubmitButton, FormStatus } from '@/presentation/components'
 import { Validation } from '@/presentation/protocols/validation'
 import { AddAppointment, SaveLocalStorage } from '@/domain/usecases'
-import { Formik } from 'formik'
+import { Formik, FormikHelpers } from 'formik'
 import * as Yup from 'yup';
 
 type Props = {
@@ -20,30 +20,24 @@ const AddAppointmentSchema = Yup.object().shape({
   appointment_date: Yup.date().required("Campo obrigatório").typeError('Digite uma data válida')
 })
 
-const AddAppointment: React.FC<Props> = ({ validation, addAppointment, saveLocalStorage }: Props) => {
-  const history = useHistory()
-
-  const handleSubmit = async (values: any, setStatus: Function, setIsSubmitting: Function): Promise<void> => {
+const AddAppointment: React.FC<Props> = ({ addAppointment }: Props) => {
+  const handleSubmit = async (values: any, actions: FormikHelpers<any>): Promise<void> => {
     try {
       const appointment = await addAppointment.add({
         name: values.name,
         birthday: new Date(values.birthday),
         appointment_date: new Date(values.appointment_date)
       })
-      await saveLocalStorage.save(appointment.id)
-      setStatus({ success: true , message: "Agendamento criado com sucesso! Redirecionando para a tela de edição" })
-      setTimeout(() => {
-        setIsSubmitting(false)
-        history.push(`/${appointment.id}`)
-      }, 3000);
+      actions.setStatus({ success: true , message: "Agendamento criado com sucesso! Redirecionando para a tela de edição" })
+      actions.setSubmitting(false)
+      actions.resetForm()
+      
     } catch (error) {
-      console.log(error)
-      setIsSubmitting(false)
-      setStatus({ success: false , message: `Erro: ${error}` })
+      actions.setSubmitting(false)
+      actions.setStatus({ success: false , message: `Erro: ${error}` })
     }
   }
 
-  
   return (
     <div className={Styles.root}>
       <div className={Styles.headerBase}>
@@ -55,8 +49,8 @@ const AddAppointment: React.FC<Props> = ({ validation, addAppointment, saveLocal
           validationSchema={AddAppointmentSchema}
           validateOnMount
           
-          onSubmit={(values, actions) => {
-            handleSubmit(values, actions.setStatus, actions.setSubmitting)
+          onSubmit={(values, actions: FormikHelpers<any>) => {
+            handleSubmit(values, actions)
           }}
         >
           {props => (

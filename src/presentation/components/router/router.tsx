@@ -9,7 +9,7 @@ const Router: React.FC<Factory> = (factory: Factory) => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/add-appointment" exact component={factory.makeAddAppointment} />
+        <Route path="/adicionar-agendamento" exact component={factory.makeAddAppointment} />
       </Switch>
     </BrowserRouter>
   )

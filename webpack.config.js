@@ -51,7 +51,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     new DefinePlugin({
-      'process.env.API_URL': JSON.stringify('localhost:3000/api')
+      'process.env.API_URL': JSON.stringify('https://alan-appointment-api.herokuapp.com/api')
     })
   ]
 }
