@@ -1,15 +1,15 @@
 import { HttpPostClient, HttpStatusCode } from '@/data/protocols/http'
 import { UnexpectedError, RestrictedDateError } from '@/domain/errors'
-import { CreateAppointmentResponseModel } from '@/domain/models'
+import { AddAppointmentModel } from '@/domain/models'
 import { AddAppointment, AddAppointmentParams } from '@/domain/usecases'
 
 export class RemoteAddAppointment implements AddAppointment {
   constructor (
     private readonly url: string,
-    private readonly httpPostClient: HttpPostClient<CreateAppointmentResponseModel>
+    private readonly httpPostClient: HttpPostClient<AddAppointmentModel>
   ) {}
 
-  async add (params: AddAppointmentParams): Promise<CreateAppointmentResponseModel> {
+  async add (params: AddAppointmentParams): Promise<AddAppointmentModel> {
     const httpResponse = await this.httpPostClient.post({
       url: this.url,
       body: params

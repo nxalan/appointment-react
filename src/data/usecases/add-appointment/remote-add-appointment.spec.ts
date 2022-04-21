@@ -4,16 +4,16 @@ import { UnexpectedError } from '@/domain/errors'
 import faker from '@faker-js/faker'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { AddAppointmentParams } from '@/domain/usecases'
-import { CreateAppointmentResponseModel } from '@/domain/models'
+import { AddAppointmentModel } from '@/domain/models'
 import { mockAddAppointmentModel, mockAddAppointmentParams } from '@/domain/test'
 
 type SutTypes = {
   sut: RemoteAddAppointment
-  httpPostClientSpy: HttpPostClientSpy<AddAppointmentParams, CreateAppointmentResponseModel>
+  httpPostClientSpy: HttpPostClientSpy<AddAppointmentParams, AddAppointmentModel>
 }
 
 const makeSut = (url: string = faker.internet.url()): SutTypes => {
-  const httpPostClientSpy = new HttpPostClientSpy<AddAppointmentParams, CreateAppointmentResponseModel>()
+  const httpPostClientSpy = new HttpPostClientSpy<AddAppointmentParams, AddAppointmentModel>()
   const sut = new RemoteAddAppointment(url, httpPostClientSpy)
   return {
     sut,

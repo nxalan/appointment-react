@@ -1,5 +1,5 @@
 import { AppointmentModel } from '@/domain/models'
 
-export interface LoadAppointments {
+export interface LoadAppointment {
   load: () => Promise<AppointmentModel>
 }
