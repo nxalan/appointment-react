@@ -3,6 +3,8 @@ import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 type Factory = {
   makeAddAppointment: React.FC
+  makeEditAppointment: React.FC
+  makeDashboard: React.FC
 }
 
 const Router: React.FC<Factory> = (factory: Factory) => {
@@ -10,6 +12,8 @@ const Router: React.FC<Factory> = (factory: Factory) => {
     <BrowserRouter>
       <Switch>
         <Route path="/adicionar-agendamento" exact component={factory.makeAddAppointment} />
+        <Route path="/" exact component={factory.makeAddAppointment} />
+        <Route path="/editar-agendamento/:id" exact component={factory.makeAddAppointment} />
       </Switch>
     </BrowserRouter>
   )

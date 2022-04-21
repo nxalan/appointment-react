@@ -1,18 +1,11 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import React from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Styles from './add-appointment-styles.scss'
 import { Footer, Header, Input, SubmitButton, FormStatus } from '@/presentation/components'
-import { Validation } from '@/presentation/protocols/validation'
-import { AddAppointment, SaveLocalStorage } from '@/domain/usecases'
+import { AddAppointment, LoadRestrictedDates } from '@/domain/usecases'
 import { Formik, FormikHelpers } from 'formik'
 import * as Yup from 'yup';
-
-type Props = {
-  validation: Validation
-  addAppointment: AddAppointment
-  saveLocalStorage: SaveLocalStorage
-}
 
 const AddAppointmentSchema = Yup.object().shape({
   name: Yup.string().required("Campo obrigatório"),
@@ -20,13 +13,18 @@ const AddAppointmentSchema = Yup.object().shape({
   appointment_date: Yup.date().required("Campo obrigatório").typeError('Digite uma data válida')
 })
 
-const AddAppointment: React.FC<Props> = ({ addAppointment }: Props) => {
+type Props = {
+  addAppointment: AddAppointment
+  loadRestrictedDates: LoadRestrictedDates
+}
+
+const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }: Props) => {
   const handleSubmit = async (values: any, actions: FormikHelpers<any>): Promise<void> => {
     try {
       const appointment = await addAppointment.add({
         name: values.name,
-        birthday: new Date(values.birthday),
-        appointment_date: new Date(values.appointment_date)
+        birthday: new Date(values.birthday).toISOString(),
+        appointment_date: new Date(values.appointment_date).toISOString(),
       })
       actions.setStatus({ success: true , message: "Agendamento criado com sucesso! Redirecionando para a tela de edição" })
       actions.setSubmitting(false)
