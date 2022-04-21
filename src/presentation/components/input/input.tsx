@@ -38,7 +38,11 @@ const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
               renderInput={(params) =>
                 <TextField
                   {...params}
+                  name={props.name}
+                  onBlur={props.onBlur}
                   required={props.required}
+                  error={props.error}
+                  helperText={props.helperText}
                   fullWidth
                 />}
             />
@@ -57,7 +61,11 @@ const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
               renderInput={(params) =>
                 <TextField
                 {...params}
+                name={props.name}
+                onBlur={props.onBlur}
                 fullWidth
+                error={props.error}
+                helperText={props.helperText}
                 required={props.required}
                 />}
             />
