@@ -24,14 +24,18 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
     restrictedDays: [],
     restrictedHours: []
   })
-
-  let selectedDay = useRef(null)
+  const [formStatus, setFormStatus] = useState({
+    error: undefined,
+    message: undefined
+  })
+  const [refresh, setRefresh] = useState(0)
+  let inputRef = useRef(null)
 
   useEffect(() => {
     loadRestrictedDates.loadDates().then((dates) => {
       setRestrictedDates(dates)
     })
-  }, [])
+  }, [refresh])
 
   function disabledDays(date) {
     let disabledDay = false
@@ -43,8 +47,8 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
 
   function disabledHours(date) {
     let disabledHour = false
-    if (selectedDay.current && selectedDay.current.value) {
-      const formatedDay = selectedDay.current.value.substr(3, 2)+"/"+selectedDay.current.value.substr(0, 2)+"/"+selectedDay.current.value.substr(6, 4)
+    if (inputRef.current && inputRef.current.value) {
+      const formatedDay = inputRef.current.value.substr(3, 2)+"/"+inputRef.current.value.substr(0, 2)+"/"+inputRef.current.value.substr(6, 4)
       const RestrictedDatesInTheSameDay = restrictedDates.restrictedHours.filter((actualDate) => (
         isSameDay(new Date(formatedDay), new Date(actualDate))
       ))
@@ -64,13 +68,13 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
         birthday: new Date(values.birthday).toISOString(),
         appointment_date: new Date(values.appointment_date).toISOString(),
       })
-      actions.setStatus({ success: true, message: "Agendamento criado com sucesso!" })
+      setFormStatus({ error: false, message: `Agendamento de ${values.name} criado com sucesso!` })
       actions.setSubmitting(false)
       actions.resetForm()
-
+      setRefresh((prevValues) => prevValues + 1)
     } catch (error) {
       actions.setSubmitting(false)
-      actions.setStatus({ success: false, message: `Erro: ${error}` })
+      setFormStatus({ error: true, message: `${error}` })
     }
   }
 
@@ -84,7 +88,6 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
           initialValues={{ name: '', birthday: null, appointment_date: null }}
           validationSchema={AddAppointmentSchema}
           validateOnMount
-
           onSubmit={(values, actions: FormikHelpers<any>) => {
             handleSubmit(values, actions)
           }}
@@ -121,7 +124,7 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
               />
               <Input
                 disabled={props.isSubmitting}
-                inputRef={selectedDay}
+                inputRef={inputRef}
                 inputType='dateTime'
                 name="appointment_date"
                 value={props.values.appointment_date}
@@ -132,7 +135,7 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
                 shouldDisableTime={disabledHours}
                 minTime={new Date(0, 0, 0, 0, 0)}
                 maxTime={new Date(0, 0, 0, 23, 0)}
-                inputFormat='dd/MM/yyyy hh:00'
+                inputFormat='dd/MM/yyyy HH:00'
                 views={['year', 'month', 'day', 'hours']}
                 error={props.touched.appointment_date && props.errors.appointment_date}
                 helperText={props.touched.appointment_date && props.errors.appointment_date}
@@ -144,10 +147,10 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
               />
               <FormStatus
                 isLoading={props.isSubmitting}
-                hasError={!props.status?.success}
-                message={props.status?.message}
+                hasError={formStatus.error}
+                message={formStatus.message}
               />
-              <Link data-testid="login-link" to="/login" className={Styles.link}>Voltar Para Agendamentos</Link>
+              <Link data-testid="login-link" to="/" className={Styles.link}>Voltar Para Agendamentos</Link>
             </form>
           )}
         </Formik>
