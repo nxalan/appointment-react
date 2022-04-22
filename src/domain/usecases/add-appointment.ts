@@ -1,11 +1,11 @@
-import { CreateAppointmentResponseModel } from '@/domain/models'
+import { AddAppointmentModel } from '@/domain/models'
 
 export type AddAppointmentParams = {
   name: string
-  birthday: Date
-  appointment_date: Date
+  birthday: string
+  appointment_date: string
 }
 
 export interface AddAppointment {
-  add: (params: AddAppointmentParams) => Promise<CreateAppointmentResponseModel>
+  add: (params: AddAppointmentParams) => Promise<AddAppointmentModel>
 }

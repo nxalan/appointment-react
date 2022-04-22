@@ -1,89 +1,163 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import React, { useState, useEffect } from 'react'
-import { Link, useHistory } from 'react-router-dom'
-import Context from '@/presentation/contexts/form/form-context'
+import React, { useEffect, useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import Styles from './add-appointment-styles.scss'
-import { Footer, Input, FormStatus, Header, SubmitButton } from '@/presentation/components'
-import { Validation } from '@/presentation/protocols/validation'
-import { AddAppointment, SaveLocalStorage } from '@/domain/usecases'
+import { Footer, Header, Input, SubmitButton, FormStatus } from '@/presentation/components'
+import { AddAppointment, LoadRestrictedDates } from '@/domain/usecases'
+import { Formik, FormikHelpers } from 'formik'
+import * as Yup from 'yup';
+import { getHours, isSameDay } from 'date-fns'
+
+const AddAppointmentSchema = Yup.object().shape({
+  name: Yup.string().required("Campo obrigatório"),
+  birthday: Yup.date().required("Campo obrigatório").typeError('Digite uma data válida').default(null),
+  appointment_date: Yup.date().required("Campo obrigatório").typeError('Digite uma data válida')
+})
 
 type Props = {
-  validation: Validation
   addAppointment: AddAppointment
-  saveLocalStorage: SaveLocalStorage
+  loadRestrictedDates: LoadRestrictedDates
 }
 
-const AddAppointment: React.FC<Props> = ({ validation, addAppointment, saveLocalStorage }: Props) => {
-  const history = useHistory()
-  const [state, setState] = useState({
-    isLoading: false,
-    isFormInvalid: true,
-    name: '',
-    birthday: '',
-    appointment_date: '',
-    nameError: '',
-    birthdayError: '',
-    appointment_dateError: '',
-    mainError: ''
+const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }: Props) => {
+  const [restrictedDates, setRestrictedDates] = useState({
+    restrictedDays: [],
+    restrictedHours: []
   })
+  const [formStatus, setFormStatus] = useState({
+    error: undefined,
+    message: undefined
+  })
+  const [refresh, setRefresh] = useState(0)
+  let inputRef = useRef(null)
 
   useEffect(() => {
-    const { name, birthday, appointment_date } = state
-    const formData = { name, birthday, appointment_date }
-    const nameError = validation.validate('name', formData)
-    const birthdayError = validation.validate('birthday', formData)
-    const appointment_dateError = validation.validate('appointment_date', formData)
+    loadRestrictedDates.loadDates().then((dates) => {
+      setRestrictedDates(dates)
+    })
+  }, [refresh])
 
-    setState((prevState) => ({
-      ...prevState,
-      nameError,
-      birthdayError,
-      appointment_dateError,
-      isFormInvalid: !!nameError || !!birthdayError || !!appointment_dateError
-    }))
-  }, [state.name, state.birthday, state.appointment_date])
+  function disabledDays(date) {
+    let disabledDay = false
+    restrictedDates.restrictedDays.forEach((actualDate) => {
+      disabledDay = isSameDay(new Date(date), new Date(actualDate))
+    })
+    return disabledDay;
+  }
 
-  const handleSubmit = async (event: React.SyntheticEvent): Promise<void> => {
-    event.preventDefault()
-    try {
-      if (state.isLoading || state.isFormInvalid) {
-        return
-      }
-      setState((prevState) => ({
-        ...prevState,
-        isLoading: true
-      }))
-      const appointment = await addAppointment.add({
-        name: state.name,
-        birthday: state.birthday as unknown as Date,
-        appointment_date: state.appointment_date as unknown as Date,
+  function disabledHours(date) {
+    let disabledHour = false
+    if (inputRef.current && inputRef.current.value) {
+      const formatedDay = inputRef.current.value.substr(3, 2)+"/"+inputRef.current.value.substr(0, 2)+"/"+inputRef.current.value.substr(6, 4)
+      const RestrictedDatesInTheSameDay = restrictedDates.restrictedHours.filter((actualDate) => (
+        isSameDay(new Date(formatedDay), new Date(actualDate))
+      ))
+      RestrictedDatesInTheSameDay.forEach((actualDate) => {
+        if (getHours(new Date(actualDate)) === date){
+          disabledHour = true
+        }
       })
-      await saveLocalStorage.save(appointment.id)
-      history.replace('/')
+    }
+    return disabledHour;
+  }
+
+  const handleSubmit = async (values: any, actions: FormikHelpers<any>): Promise<void> => {
+    try {
+      const appointment = await addAppointment.add({
+        name: values.name,
+        birthday: new Date(values.birthday).toISOString(),
+        appointment_date: new Date(values.appointment_date).toISOString(),
+      })
+      setFormStatus({ error: false, message: `Agendamento de ${values.name} criado com sucesso!` })
+      actions.setSubmitting(false)
+      actions.resetForm()
+      setRefresh((prevValues) => prevValues + 1)
     } catch (error) {
-      setState((prevState) => ({
-        ...prevState,
-        isLoading: false,
-        mainError: error.message
-      }))
+      actions.setSubmitting(false)
+      setFormStatus({ error: true, message: `${error}` })
     }
   }
 
   return (
-    <div className={Styles.addAppointment}>
-      <Header />
-      <Context.Provider value={{ state, setState }}>
-        <form data-testid="form" className={Styles.form} onSubmit={handleSubmit}>
-          <h2>Criar Conta</h2>
-          <Input type="text" name="name" placeholder="Digite seu nome" />
-          <Input type="text" name="birthday" placeholder="Digite sua data de nascimento" />
-          <Input type="text" name="appointment_date" placeholder="Digite seu horário de agendamento" />
-          <SubmitButton text="Cadastrar" />
-          <Link data-testid="appointments-link" replace to="/appointments" className={Styles.link}>Voltar Para Agendamentos</Link>
-          <FormStatus />
-        </form>
-      </Context.Provider>
-      <Footer />
+    <div className={Styles.root}>
+      <div className={Styles.headerBase}>
+        <Header />
+      </div>
+      <div className={Styles.centerBase}>
+        <Formik
+          initialValues={{ name: '', birthday: null, appointment_date: null }}
+          validationSchema={AddAppointmentSchema}
+          validateOnMount
+          onSubmit={(values, actions: FormikHelpers<any>) => {
+            handleSubmit(values, actions)
+          }}
+        >
+          {props => (
+            <form data-testid="form" className={Styles.form} onSubmit={props.handleSubmit}>
+              <h2>Criar Novo Agendamento</h2>
+              <Input
+                disabled={props.isSubmitting}
+                inputType='text'
+                type="text"
+                fullWidth
+                name="name"
+                label="Nome"
+                required
+                placeholder="Digite seu nome"
+                onChange={props.handleChange}
+                onBlur={props.handleBlur}
+                value={props.values.name}
+                error={props.touched.name && props.errors?.name}
+                helperText={props.touched.name && props.errors?.name}
+              />
+              <Input
+                disabled={props.isSubmitting}
+                inputType='date'
+                name="birthday"
+                value={props.values.birthday}
+                onChange={(value) => { props.setFieldValue('birthday', value); }}
+                label="Data de Nascimento"
+                onBlur={props.handleBlur}
+                error={props.touched.birthday && props.errors.birthday}
+                helperText={props.touched.birthday && props.errors.birthday}
+                required
+              />
+              <Input
+                disabled={props.isSubmitting}
+                inputRef={inputRef}
+                inputType='dateTime'
+                name="appointment_date"
+                value={props.values.appointment_date}
+                onChange={(value) => { props.setFieldValue('appointment_date', value); }}
+                label="Data de Agendamento"
+                onBlur={props.handleBlur}
+                shouldDisableDate={disabledDays}
+                shouldDisableTime={disabledHours}
+                minTime={new Date(0, 0, 0, 0, 0)}
+                maxTime={new Date(0, 0, 0, 23, 0)}
+                inputFormat='dd/MM/yyyy HH:00'
+                views={['year', 'month', 'day', 'hours']}
+                error={props.touched.appointment_date && props.errors.appointment_date}
+                helperText={props.touched.appointment_date && props.errors.appointment_date}
+                required
+              />
+              <SubmitButton
+                disabled={!props.isValid}
+                text="Cadastrar"
+              />
+              <FormStatus
+                isLoading={props.isSubmitting}
+                hasError={formStatus.error}
+                message={formStatus.message}
+              />
+              <Link data-testid="login-link" to="/" className={Styles.link}>Voltar Para Agendamentos</Link>
+            </form>
+          )}
+        </Formik>
+      </div>
+      <div className={Styles.footerBase}>
+        <Footer />
+      </div>
     </div>
   )
 }

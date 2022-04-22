@@ -12,7 +12,16 @@
 
   .error {
     margin-top: 30px;
-    color: $primaryLight;
+    text-align: center;
+    font-weight: 900;
+    color: $invalid;
+  }
+
+  .success {
+    text-align: center;
+    margin-top: 30px;
+    font-weight: 900;
+    color: $valid;
   }
 
 }
