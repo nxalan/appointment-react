@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index",
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
     "test": "npx jest --passWithNoTests --no-cache --runInBand",
@@ -64,6 +65,8 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@mui/material": "^5.6.2",
+    "express": "^4.17.1",
+    "express-history-api-fallback": "^2.2.1",
     "@mui/x-data-grid": "^5.9.0",
     "@mui/x-date-pickers": "^5.0.0-alpha.1",
     "axios": "^0.26.1",
