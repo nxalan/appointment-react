@@ -2,5 +2,5 @@ commands
 node_modules
 .vscode
 coverage
-public/js
 package-lock.json
+dist
