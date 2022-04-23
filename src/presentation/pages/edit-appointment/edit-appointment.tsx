@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react"
-import { useParams } from 'react-router-dom'
 import { EditAppointment, LoadAppointment, LoadRestrictedDates, DeleteAppointment } from "@/domain/usecases"
-import { Footer, Header, Input, Button, FormStatus } from '@/presentation/components'
+import { Footer, Header, Input, Button, FormStatus, Snackbar, AlertDialog } from '@/presentation/components'
 import { Formik, FormikHelpers } from 'formik'
 import Styles from './edit-appointment-styles.scss'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { Divider } from "@mui/material"
 
 type Props = {
@@ -16,6 +15,9 @@ type Props = {
 
 
 const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, loadRestrictedDates, deleteAppointment }: Props) => {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deleteDialogSuccessMessage, setDeleteDialogSuccessMessage] = useState(false)
+  const [deleteDialogErrorMessage, setDeleteDialogErrorMessage] = useState(false)
   const [currentAppointment, setCurrentAppointment] = useState({
     id: '',
     name: '',
@@ -24,6 +26,7 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
     status: '',
     status_comment: ''
   })
+  const history = useHistory()
 
   useEffect(() => {
     loadAppointment.load().then((appointment) => {
@@ -31,12 +34,65 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
     })
   }, [])
 
+    const handleDeleteAppointmentSubmit = async (): Promise<void> => {
+      console.log('rodei')
+    try {
+      const result = await deleteAppointment.delete()
+      if (result) {
+        setDeleteDialogOpen(false)
+        setDeleteDialogSuccessMessage(true)
+        setTimeout(() => {
+          history.push('/')
+        }, 2000);
+      }
+      else {
+        setDeleteDialogOpen(false)
+        setDeleteDialogErrorMessage(true);
+      }
+    } catch (error) {
+      setDeleteDialogOpen(false)
+      setDeleteDialogErrorMessage(true);
+    }
+  }
+
+  const handleDialogSuccessClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setDeleteDialogErrorMessage(false);
+  }
+
+  const handleDialogErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setDeleteDialogErrorMessage(false);
+  }
+
   return (
     <div className={Styles.root}>
       <div className={Styles.headerBase}>
         <Header />
       </div>
       <div className={Styles.centerBase}>
+        
+        <Snackbar 
+        successMessage={deleteDialogSuccessMessage}
+        setSuccessMessage={setDeleteDialogSuccessMessage}
+        errorMessage={deleteDialogErrorMessage}
+        setErrorMessage={setDeleteDialogErrorMessage}
+        handleErrorClose={handleDialogSuccessClose}
+        handleSuccessClose={handleDialogErrorClose}
+        />
+     
+        <AlertDialog
+          dialogStatus={deleteDialogOpen}
+          closeDialog={setDeleteDialogOpen}
+          handleConfirm={() => handleDeleteAppointmentSubmit()}
+          title={'Deseja realmente excluir o agendamento?'}
+          message={`O agendamento de ${currentAppointment.name} será permanentemente excluido do sistema`}
+        />
+
         <Formik
           enableReinitialize={true}
           initialValues={currentAppointment}
@@ -132,7 +188,7 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
                 disabled={!props.isValid}
                 text="Excluir Agendamento"
                 type="error"
-                onClick={() => console.log('cliquei')}
+                onClick={() => setDeleteDialogOpen(true)}
               />
             </form>
           )}

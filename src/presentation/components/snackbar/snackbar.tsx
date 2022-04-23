@@ -16,7 +16,7 @@ export default function CustomizedSnackbars(props) {
     <>
       <Snackbar open={props.successMessage} autoHideDuration={3000} onClose={props.handleSuccessClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Alert onClose={props.handleSuccessClose} severity="success" sx={{ width: '100%' }}>
-          Agendamento excluido com sucesso!
+          Agendamento excluido com sucesso! Redirecionando para a página principal
         </Alert>
       </Snackbar>
       <Snackbar open={props.errorMessage} autoHideDuration={3000} onClose={props.handleErrorClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
