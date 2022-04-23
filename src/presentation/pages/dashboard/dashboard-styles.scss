@@ -54,3 +54,14 @@
   flex-direction: column;
   margin: 0 1rem 2rem;
 }
+
+.editIcon {
+  color: $primaryLight;
+  font-size: 20px;
+}
+
+
+.deleteIcon {
+  color: $invalid;
+  font-size: 20px;
+}
