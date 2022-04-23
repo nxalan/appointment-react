@@ -11,9 +11,9 @@ const Router: React.FC<Factory> = (factory: Factory) => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/adicionar-agendamento" exact component={factory.makeAddAppointment} />
+        <Route path="/agendamento" exact component={factory.makeAddAppointment} />
         <Route path="/" exact component={factory.makeDashboard} />
-        <Route path="/editar-agendamento/:id" exact component={factory.makeEditAppointment} />
+        <Route path="/agendamento/:id" exact component={factory.makeEditAppointment} />
       </Switch>
     </BrowserRouter>
   )

@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 
 export const navMap = [
   { name: 'Listar Agendamentos', to: '/', icon: <IoMdPeople /> },
-  { name: 'Adicionar Agendamento', to: '/adicionar-agendamento', icon: <MdPersonAddAlt1 /> },
+  { name: 'Adicionar Agendamento', to: '/agendamento', icon: <MdPersonAddAlt1 /> },
 ];
 
 const HomeHeader: React.FC = () => {

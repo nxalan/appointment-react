@@ -12,7 +12,6 @@ import { useHistory } from "react-router-dom";
 
 type Props = {
   loadAppointments: LoadAppointments
-  deleteAppointment: DeleteAppointment
 }
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -22,7 +21,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Props) => {
+const Dashboard: React.FC<Props> = ({ loadAppointments }: Props) => {
   const [appointmentsList, setAppointmentsList] = useState([])
   const history = useHistory()
 
@@ -97,7 +96,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerName: 'Nome',
       minWidth: 200,
       flex: 1,
-      disableColumnMenu: true,
       headerAlign: 'center',
       align: 'center',
     },
@@ -106,7 +104,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerName: 'Data de Nascimento',
       type: 'date',
       flex: 0.5,
-      disableColumnMenu: true,
       headerAlign: 'center',
       align: 'center',
       valueFormatter: (params: GridValueFormatterParams) => {
@@ -117,7 +114,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       field: 'appointment_date_day',
       headerName: 'Data de Agendamento',
       flex: 0.5,
-      disableColumnMenu: true,
       headerAlign: 'center',
       align: 'center',
       valueGetter: getAppointmentDate,
@@ -127,7 +123,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerName: 'Horário de Agendamento',
       flex: 0.5,
       headerAlign: 'center',
-      disableColumnMenu: true,
       align: 'center',
       valueGetter: getAppointmentTime,
     },
@@ -136,7 +131,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerName: 'Status',
       headerAlign: 'center',
       flex: 0.5,
-      disableColumnMenu: true,
       align: 'center',
       valueGetter: getStatusTranslated,
     }

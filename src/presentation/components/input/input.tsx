@@ -1,6 +1,6 @@
 import React from 'react'
 import Styles from './input-styles.scss'
-import { TextField } from '@mui/material';
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import { registerLocale } from "react-datepicker";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -12,21 +12,21 @@ type Props = { [key: string]: any }
 
 const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
   registerLocale("pt", pt);
-  const componentType = props.inputType
   return (
     <>
-      {componentType === 'text' && (
+      {props.type === 'text' && (
         <div className={Styles.textField}>
           <TextField
             variant="outlined"
             fullWidth
             type={props.type}
+            name={props.name}
             {...props}
           />
         </div>
       )}
 
-      {componentType === 'date' && (
+      {props.type === 'date' && (
         <div className={Styles.dateField}>
           <LocalizationProvider locale={pt} dateAdapter={AdapterDateFns}>
             <DatePicker
@@ -49,7 +49,7 @@ const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
         </div>
       )}
 
-      {componentType === 'dateTime' && (
+      {props.type === 'dateTime' && (
         <div className={Styles.dateField}>
           <LocalizationProvider locale={pt} dateAdapter={AdapterDateFns}>
             <DateTimePicker
@@ -59,19 +59,54 @@ const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
               {...props}
               renderInput={(params) =>
                 <TextField
-                {...params}
-                name={props.name}
-                onBlur={props.onBlur}
-                fullWidth
-                error={props.error}
-                helperText={props.helperText}
-                required={props.required}
+                  {...params}
+                  name={props.name}
+                  onBlur={props.onBlur}
+                  fullWidth
+                  error={props.error}
+                  helperText={props.helperText}
+                  required={props.required}
                 />}
             />
           </LocalizationProvider>
         </div>
       )}
 
+      {props.type === 'radio' && (
+        <div className={Styles.radioButton}>
+          <FormControl>
+            <FormLabel id="demo-controlled-radio-buttons-group">{props.title}</FormLabel>
+            <RadioGroup
+              row
+              aria-labelledby="controlled-radio-buttons-group"
+              name="controlled-radio-button"
+              value={props.value}
+              onChange={props.onChange}
+            >
+              {props.radioLabels.map((el) => (
+                <FormControlLabel
+                  value={el.value}
+                  control={<Radio />}
+                  label={el.label}
+                  disabled={props.disabled} />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </div>
+      )}
+
+      {props.type === 'multiline' && (
+        <div className={Styles.multilineField}>
+          <TextField
+            id="outlined-multiline-static"
+            label={props.label}
+            multiline
+            fullWidth
+            rows={props.rows}
+            defaultValue=""
+          />
+        </div>
+      )}
     </>
   )
 }

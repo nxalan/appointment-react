@@ -12,7 +12,6 @@ export const makeDashboard: React.FC = () => {
   return (
     <Dashboard
       loadAppointments={makeRemoteLoadAppointments()}
-      deleteAppointment={makeRemoteDeleteAppointment(id)}
     />
   )
 }

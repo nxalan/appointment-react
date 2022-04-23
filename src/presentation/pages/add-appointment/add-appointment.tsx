@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Styles from './add-appointment-styles.scss'
-import { Footer, Header, Input, SubmitButton, FormStatus } from '@/presentation/components'
+import { Footer, Header, Input, Button, FormStatus } from '@/presentation/components'
 import { AddAppointment, LoadRestrictedDates } from '@/domain/usecases'
 import { Formik, FormikHelpers } from 'formik'
 import * as Yup from 'yup';
@@ -141,9 +141,10 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
                 helperText={props.touched.appointment_date && props.errors.appointment_date}
                 required
               />
-              <SubmitButton
+              <Button
                 disabled={!props.isValid}
                 text="Cadastrar"
+                type="submit"
               />
               <FormStatus
                 isLoading={props.isSubmitting}
