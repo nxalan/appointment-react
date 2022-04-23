@@ -1,0 +1,18 @@
+@import "../../styles/colors.scss";
+
+
+.formRoot {
+  width: 100%;
+  box-shadow: 0px 1px 3px -1px $black;
+}
+
+.formContent {
+  display: flex;
+  height: 100%;
+}
+
+
+.Header {
+  background-color: $primary;
+  color: red;
+}
