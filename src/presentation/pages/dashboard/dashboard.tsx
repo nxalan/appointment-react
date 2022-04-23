@@ -12,7 +12,6 @@ import { useHistory } from "react-router-dom";
 
 type Props = {
   loadAppointments: LoadAppointments
-  deleteAppointment: DeleteAppointment
 }
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
@@ -22,7 +21,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Props) => {
+const Dashboard: React.FC<Props> = ({ loadAppointments }: Props) => {
   const [appointmentsList, setAppointmentsList] = useState([])
   const history = useHistory()
 
@@ -55,17 +54,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
     return message
   }
 
-  /*
-  function openDeleteDialog(appointment) {
-    setCurrentAppointment(appointment)
-    setDeleteDialog(true)
-  }
-
-  function closeDeleteDialog() {
-    setDeleteDialog(false)
-  }
-  */
-
   const columns: GridColDef[] = [
     {
       field: 'actions',
@@ -82,13 +70,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
               <MdEdit className={Styles.editIcon} />
             </IconButton>
           </Tooltip>
-          {/*}
-          <Tooltip title="Excluir">
-            <IconButton onClick={() => openDeleteDialog(params.row)}>
-              <MdDelete className={Styles.deleteIcon} />
-            </IconButton>
-          </Tooltip>
-      */}
         </>
       ),
     },
@@ -97,7 +78,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerName: 'Nome',
       minWidth: 200,
       flex: 1,
-      disableColumnMenu: true,
       headerAlign: 'center',
       align: 'center',
     },
@@ -106,7 +86,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerName: 'Data de Nascimento',
       type: 'date',
       flex: 0.5,
-      disableColumnMenu: true,
       headerAlign: 'center',
       align: 'center',
       valueFormatter: (params: GridValueFormatterParams) => {
@@ -117,7 +96,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       field: 'appointment_date_day',
       headerName: 'Data de Agendamento',
       flex: 0.5,
-      disableColumnMenu: true,
       headerAlign: 'center',
       align: 'center',
       valueGetter: getAppointmentDate,
@@ -127,7 +105,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerName: 'Horário de Agendamento',
       flex: 0.5,
       headerAlign: 'center',
-      disableColumnMenu: true,
       align: 'center',
       valueGetter: getAppointmentTime,
     },
@@ -136,41 +113,10 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerName: 'Status',
       headerAlign: 'center',
       flex: 0.5,
-      disableColumnMenu: true,
       align: 'center',
       valueGetter: getStatusTranslated,
     }
   ];
-
-  /*const handleDeleteSubmit = async (appointment_id: string): Promise<void> => {
-    console.log(appointment_id)
-    try {
-      await deleteAppointment.delete()
-      closeDeleteDialog()
-      setRefresh((prevValues) => prevValues + 1)
-      setSuccessMessage(true)
-    } catch (error) {
-      closeDeleteDialog()
-      setErrorMessage(true);
-    }
-  }
-  */
-
-  /*
-  const handleSuccessClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSuccessMessage(false);
-  }
-
-  const handleErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setErrorMessage(false);
-  }
-  */
 
   return (
     <div className={Styles.root}>
@@ -182,24 +128,6 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
           rows={appointmentsList}
           columns={columns}
         />
-        {/*
-        <Snackbar 
-        successMessage={successMessage}
-        setSuccessMessage={setSuccessMessage}
-        errorMessage={errorMessage}
-        setErrorMessage={setErrorMessage}
-        handleErrorClose={handleErrorClose}
-        handleSuccessClose={handleSuccessClose}
-        />
-        <AlertDialog
-          dialogStatus={deleteDialog}
-          openDialog={openDeleteDialog}
-          closeDialog={closeDeleteDialog}
-          handleConfirm={() => handleDeleteSubmit(currentAppointment.id)}
-          title={'Deseja realmente excluir o agendamento?'}
-          message={`O agendamento de ${currentAppointment.name} será permanentemente excluido do sistema`}
-        />
-         */}
       </div>
       <div className={Styles.footerBase}>
         <Footer />
