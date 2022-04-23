@@ -13,7 +13,6 @@ type Props = { [key: string]: any }
 const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
   registerLocale("pt", pt);
   const componentType = props.inputType
-  delete props.inputType;
   return (
     <>
       {componentType === 'text' && (
