@@ -18,6 +18,7 @@ const SubmitButton: React.FC<Props> = (props: Props) => {
         <div className={Styles.button}>
           <Button
             disabled={props.disabled}
+            onClick={props.onClick}
             variant="contained"
             type="submit"
           >
