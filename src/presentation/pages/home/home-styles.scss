@@ -1,0 +1,31 @@
+@import "../../styles/colors.scss";
+
+
+.root {
+  height: 99vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.headerBase {
+  width: 100%;
+  background-color: $primary;
+  box-shadow: $primaryLight 0px 1px 5px 0px;
+  z-index: 998;
+  position: sticky;
+  top: 0;
+}
+
+.footerBase {
+  width: 100%;
+  background-color: $background;
+  z-index: 997;
+  bottom: 1;
+}
+
+.centerBase {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  justify-content: space-between;
+}

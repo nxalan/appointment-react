@@ -5,15 +5,17 @@ type Factory = {
   makeAddAppointment: React.FC
   makeEditAppointment: React.FC
   makeDashboard: React.FC
+  makeHomePage: React.FC
 }
 
 const Router: React.FC<Factory> = (factory: Factory) => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/adicionar-agendamento" exact component={factory.makeAddAppointment} />
-        <Route path="/" exact component={factory.makeDashboard} />
-        <Route path="/editar-agendamento/:id" exact component={factory.makeEditAppointment} />
+        <Route path="/" exact component={factory.makeHomePage} />
+        <Route path="/agendamento" exact component={factory.makeAddAppointment} />
+        <Route path="/agendamentos" exact component={factory.makeDashboard} />
+        <Route path="/agendamento/:id" exact component={factory.makeEditAppointment} />
       </Switch>
     </BrowserRouter>
   )

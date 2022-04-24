@@ -13,3 +13,20 @@
   margin-top: 40px;
 }
 
+.radioButton {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  border: solid;
+  border-radius: 4px;
+  border-width: 1.3px;
+  box-sizing: content-box;
+  padding: 5px 0px;
+  border-color: rgba(118, 118, 118, 0.3);
+  color: -internal-light-dark(rgb(84, 84, 84), rgb(170, 170, 170));
+}
+
+.multilineField {
+  margin-top: 40px;
+  width: 100%;
+}

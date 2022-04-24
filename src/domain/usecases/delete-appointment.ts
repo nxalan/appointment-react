@@ -1,5 +1,9 @@
 import { AppointmentModel } from '@/domain/models'
 
+export type DeleteAppointmentParams = {
+  id: string
+}
+
 export interface DeleteAppointment {
-  delete: () => Promise<AppointmentModel>
+  delete: (params: DeleteAppointmentParams) => Promise<AppointmentModel>
 }

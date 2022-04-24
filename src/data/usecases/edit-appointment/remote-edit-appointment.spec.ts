@@ -1,5 +1,5 @@
 import { RemoteEditAppointment } from './remote-edit-appointment'
-import { HttpPutClientSpy } from '@/data/test'
+import { HttpPatchClientSpy } from '@/data/test'
 import { UnexpectedError } from '@/domain/errors'
 import faker from '@faker-js/faker'
 import { HttpStatusCode } from '@/data/protocols/http'
@@ -9,36 +9,36 @@ import { mockAppointmentModel, mockEditAppointmentParams } from '@/domain/test'
 
 type SutTypes = {
   sut: RemoteEditAppointment
-  httpPutClientSpy: HttpPutClientSpy<EditAppointmentParams, AppointmentModel>
+  httpPatchClientSpy: HttpPatchClientSpy<EditAppointmentParams, AppointmentModel>
 }
 
 const makeSut = (url: string = faker.internet.url()): SutTypes => {
-  const httpPutClientSpy = new HttpPutClientSpy<EditAppointmentParams, AppointmentModel>()
-  const sut = new RemoteEditAppointment(url, httpPutClientSpy)
+  const httpPatchClientSpy = new HttpPatchClientSpy<EditAppointmentParams, AppointmentModel>()
+  const sut = new RemoteEditAppointment(url, httpPatchClientSpy)
   return {
     sut,
-    httpPutClientSpy
+    httpPatchClientSpy
   }
 }
 
 describe('RemoteAuthentication', () => {
   test('Should call HttpPutClient with correct URL', async () => {
     const url = faker.internet.url()
-    const { sut, httpPutClientSpy } = makeSut(url)
+    const { sut, httpPatchClientSpy } = makeSut(url)
     await sut.edit(mockEditAppointmentParams())
-    expect(httpPutClientSpy.url).toBe(url)
+    expect(httpPatchClientSpy.url).toBe(url)
   })
 
   test('Should call HttpPutClient with correct body', async () => {
-    const { sut, httpPutClientSpy } = makeSut()
+    const { sut, httpPatchClientSpy } = makeSut()
     const editAppointmentParams = mockEditAppointmentParams()
     await sut.edit(editAppointmentParams)
-    expect(httpPutClientSpy.body).toEqual(editAppointmentParams)
+    expect(httpPatchClientSpy.body).toEqual(editAppointmentParams)
   })
 
   test('Should throw UnexpectedError if HttpPutClient returns 400', async () => {
-    const { sut, httpPutClientSpy } = makeSut()
-    httpPutClientSpy.response = {
+    const { sut, httpPatchClientSpy } = makeSut()
+    httpPatchClientSpy.response = {
       statusCode: HttpStatusCode.badRequest
     }
     const promise = sut.edit(mockEditAppointmentParams())
@@ -46,8 +46,8 @@ describe('RemoteAuthentication', () => {
   })
 
   test('Should throw UnexpectedError if HttpPostClient returns 500', async () => {
-    const { sut, httpPutClientSpy } = makeSut()
-    httpPutClientSpy.response = {
+    const { sut, httpPatchClientSpy } = makeSut()
+    httpPatchClientSpy.response = {
       statusCode: HttpStatusCode.serverError
     }
     const promise = sut.edit(mockEditAppointmentParams())
@@ -55,8 +55,8 @@ describe('RemoteAuthentication', () => {
   })
 
   test('Should throw UnexpectedError if HttpPostClient returns 404', async () => {
-    const { sut, httpPutClientSpy } = makeSut()
-    httpPutClientSpy.response = {
+    const { sut, httpPatchClientSpy } = makeSut()
+    httpPatchClientSpy.response = {
       statusCode: HttpStatusCode.notFound
     }
     const promise = sut.edit(mockEditAppointmentParams())
@@ -64,9 +64,9 @@ describe('RemoteAuthentication', () => {
   })
 
   test('Should return an AppointmentModel if HttpPostClient returns 200', async () => {
-    const { sut, httpPutClientSpy } = makeSut()
+    const { sut, httpPatchClientSpy } = makeSut()
     const httpResult = mockAppointmentModel()
-    httpPutClientSpy.response = {
+    httpPatchClientSpy.response = {
       statusCode: HttpStatusCode.ok,
       body: httpResult
     }

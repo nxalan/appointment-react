@@ -13,20 +13,14 @@ export const mockAxiosPost = (): jest.Mocked<typeof axios> => {
   return mockedAxios
 }
 
-export const mockAxiosPut = (): jest.Mocked<typeof axios> => {
+export const mockAxiosPatch = (): jest.Mocked<typeof axios> => {
   const mockedAxios = axios as jest.Mocked<typeof axios>
-  mockedAxios.put.mockResolvedValue(mockHttpResponse())
+  mockedAxios.patch.mockResolvedValue(mockHttpResponse())
   return mockedAxios
 }
 
 export const mockAxiosGet = (): jest.Mocked<typeof axios> => {
   const mockedAxios = axios as jest.Mocked<typeof axios>
   mockedAxios.get.mockResolvedValue(mockHttpResponse())
-  return mockedAxios
-}
-
-export const mockAxiosDelete = (): jest.Mocked<typeof axios> => {
-  const mockedAxios = axios as jest.Mocked<typeof axios>
-  mockedAxios.delete.mockResolvedValue(mockHttpResponse())
   return mockedAxios
 }

@@ -1,32 +1,54 @@
+/* eslint-disable no-unused-vars */
 import React from 'react'
 import Styles from './input-styles.scss'
-import { TextField } from '@mui/material';
-import { registerLocale } from "react-datepicker";
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import pt from "date-fns/locale/pt"
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material'
+import { registerLocale } from 'react-datepicker'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import pt from 'date-fns/locale/pt'
+import { CalendarOrClockPickerView } from '@mui/x-date-pickers/internals/models'
 
-type Props = { [key: string]: any }
+type Props = {
+  radioLabels?: any[]
+  type: string
+  name: string
+  required?: boolean
+  placeholder?: string
+  label?: string
+  value: string
+  disabled?: boolean
+  helperText?: React.ReactNode
+  title?: string
+  error?: boolean
+  rows?: number
+  minTime?: Date
+  maxTime?: Date
+  inputFormat?: string
+  dateViews?: CalendarOrClockPickerView[]
+  shouldDisableDate?: (date: any) => boolean
+  shouldDisableTime?: (date: any) => boolean
+  onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>
+  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
+  inputRef?: React.Ref<HTMLInputElement>
+}
 
-const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
-  registerLocale("pt", pt);
-  const componentType = props.inputType
+const InputText: React.FC<Props> = (props: Props) => {
+  registerLocale('pt', pt)
   return (
     <>
-      {componentType === 'text' && (
+      {props.type === 'text' && (
         <div className={Styles.textField}>
           <TextField
-            variant="outlined"
             fullWidth
-            type={props.type}
+            variant="outlined"
             {...props}
           />
         </div>
       )}
 
-      {componentType === 'date' && (
+      {props.type === 'date' && (
         <div className={Styles.dateField}>
           <LocalizationProvider locale={pt} dateAdapter={AdapterDateFns}>
             <DatePicker
@@ -49,29 +71,67 @@ const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
         </div>
       )}
 
-      {componentType === 'dateTime' && (
+      {props.type === 'dateTime' && (
         <div className={Styles.dateField}>
           <LocalizationProvider locale={pt} dateAdapter={AdapterDateFns}>
             <DateTimePicker
               label={props.label}
               value={props.value}
               onChange={props.onChange}
+              views={props.dateViews}
               {...props}
               renderInput={(params) =>
                 <TextField
-                {...params}
-                name={props.name}
-                onBlur={props.onBlur}
-                fullWidth
-                error={props.error}
-                helperText={props.helperText}
-                required={props.required}
+                  {...params}
+                  name={props.name}
+                  onBlur={props.onBlur}
+                  fullWidth
+                  error={props.error}
+                  helperText={props.helperText}
+                  required={props.required}
                 />}
             />
           </LocalizationProvider>
         </div>
       )}
 
+      {props.type === 'radio' && (
+        <div className={Styles.radioButton}>
+          <FormControl>
+            <FormLabel id="demo-controlled-radio-buttons-group">{props.title}</FormLabel>
+            <RadioGroup
+              name={props.name}
+              row
+              aria-labelledby="controlled-radio-buttons-group"
+              value={props.value}
+              onChange={props.onChange}
+            >
+              {props.radioLabels.map((el) => (
+                <FormControlLabel
+                  key={el.value}
+                  value={el.value}
+                  control={<Radio />}
+                  label={el.label}
+                  disabled={props.disabled} />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </div>
+      )}
+
+      {props.type === 'multiline' && (
+        <div className={Styles.multilineField}>
+          <TextField
+            name={props.name}
+            id="outlined-multiline-static"
+            label={props.label}
+            multiline
+            fullWidth
+            rows={props.rows}
+            {...props}
+          />
+        </div>
+      )}
     </>
   )
 }

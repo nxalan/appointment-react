@@ -11,7 +11,7 @@ export class RemoteLoadAppointment implements LoadAppointment {
 
   async load (): Promise<AppointmentModel> {
     const httpResponse = await this.httpGetClient.get({
-      url: this.url,
+      url: this.url
     })
     switch (httpResponse.statusCode) {
       case HttpStatusCode.ok: break
