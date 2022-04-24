@@ -10,6 +10,7 @@ export const makeEditAppointmentPage: React.FC = () => {
     id: string
   }
   const { id } = useParams<Props>()
+  console.log(id)
   return (
     <EditAppointmentPage
       loadAppointment={makeRemoteLoadAppointment(id)}
