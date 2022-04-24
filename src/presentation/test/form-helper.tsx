@@ -11,7 +11,7 @@ export const testButtonIsDisabled = (sut: RenderResult, fieldName: string, isDis
   expect(button.disabled).toBe(isDisabled)
 }
 
-export const testStatusForField = (sut: RenderResult, fieldName: string, validationError: string = ''): void => {
+export const testStatusForField = (sut: RenderResult, fieldName: string, validationError = ''): void => {
   const wrap = sut.getByTestId(`${fieldName}-wrap`)
   const field = sut.getByTestId(fieldName)
   const label = sut.getByTestId(`${fieldName}-label`)

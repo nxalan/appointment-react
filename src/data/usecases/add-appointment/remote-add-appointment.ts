@@ -1,5 +1,5 @@
 import { HttpPostClient, HttpStatusCode } from '@/data/protocols/http'
-import { UnexpectedError, RestrictedDateError,  } from '@/domain/errors'
+import { UnexpectedError, RestrictedDateError } from '@/domain/errors'
 import { AddAppointmentModel } from '@/domain/models'
 import { AddAppointment, AddAppointmentParams } from '@/domain/usecases'
 

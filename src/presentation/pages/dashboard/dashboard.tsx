@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react"
-import { DeleteAppointment, LoadAppointments } from "@/domain/usecases"
-import { Header, Footer, Table, Snackbar, AlertDialog } from "@/presentation/components"
+import React, { useState, useEffect } from 'react'
+import { DeleteAppointment, LoadAppointments } from '@/domain/usecases'
+import { Header, Footer, Table, Snackbar, AlertDialog } from '@/presentation/components'
 import Styles from './dashboard-styles.scss'
-import IconButton from '@mui/material/IconButton';
-import { MdEdit, MdDelete } from 'react-icons/md';
-import Tooltip from "@mui/material/Tooltip";
-import { GridColDef, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
+import IconButton from '@mui/material/IconButton'
+import { MdEdit, MdDelete } from 'react-icons/md'
+import Tooltip from '@mui/material/Tooltip'
+import { GridColDef, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid'
 import { format } from 'date-fns'
-import { useHistory } from "react-router-dom";
+import { useHistory } from 'react-router-dom'
 
 type Props = {
   loadAppointments: LoadAppointments
@@ -16,7 +16,7 @@ type Props = {
 
 const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Props) => {
   const [appointmentsList, setAppointmentsList] = useState([])
-  const [selectedAppointment, setSelectedAppointment] = useState({id: '', name: ''})
+  const [selectedAppointment, setSelectedAppointment] = useState({ id: '', name: '' })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deleteSnackbarSuccessOpen, setDeleteSnackbarSuccessOpen] = useState(false)
   const [deleteSnackbarErrorOpen, setDeleteSnackbarErrorOpen] = useState(false)
@@ -33,23 +33,23 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
     })
   }, [refresh])
 
-  function getAppointmentDate(params) {
-    return format(new Date(params.row.appointment_date), 'dd/MM/yyyy');
+  function getAppointmentDate (params) {
+    return format(new Date(params.row.appointment_date), 'dd/MM/yyyy')
   }
 
-  function getAppointmentTime(params) {
-    return format(new Date(params.row.appointment_date), 'HH:mm');
+  function getAppointmentTime (params) {
+    return format(new Date(params.row.appointment_date), 'HH:mm')
   }
 
-  function getStatusTranslated(params) {
+  function getStatusTranslated (params) {
     let message = ''
     switch (params.row.status) {
       case 'NOT VACCINED':
         message = 'NÃO ATENDIDO'
-        break;
+        break
       case 'VACCINED':
         message = 'ATENDIDO'
-        break;
+        break
       default:
         message = params.row.status
     }
@@ -78,7 +78,7 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
             </IconButton>
           </Tooltip>
         </>
-      ),
+      )
     },
     {
       field: 'name',
@@ -86,7 +86,7 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       minWidth: 200,
       flex: 1,
       headerAlign: 'center',
-      align: 'center',
+      align: 'center'
     },
     {
       field: 'birthday',
@@ -96,8 +96,8 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerAlign: 'center',
       align: 'center',
       valueFormatter: (params: GridValueFormatterParams) => {
-        return format(new Date(params.value), 'dd/MM/yyyy');
-      },
+        return format(new Date(params.value), 'dd/MM/yyyy')
+      }
     },
     {
       field: 'appointment_date_day',
@@ -105,7 +105,7 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       flex: 0.5,
       headerAlign: 'center',
       align: 'center',
-      valueGetter: getAppointmentDate,
+      valueGetter: getAppointmentDate
     },
     {
       field: 'appointment_date_hour',
@@ -113,7 +113,7 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       flex: 0.5,
       headerAlign: 'center',
       align: 'center',
-      valueGetter: getAppointmentTime,
+      valueGetter: getAppointmentTime
     },
     {
       field: 'status-translated',
@@ -121,9 +121,9 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       headerAlign: 'center',
       flex: 0.5,
       align: 'center',
-      valueGetter: getStatusTranslated,
+      valueGetter: getStatusTranslated
     }
-  ];
+  ]
 
   const handleDeleteAppointmentSubmit = async (): Promise<void> => {
     try {
@@ -132,34 +132,33 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
         setDeleteDialogOpen(false)
         setRefresh(refresh + 1)
         setDeleteSnackbarSuccessOpen(true)
-      }
-      else {
+      } else {
         setDeleteDialogOpen(false)
-        setDeleteSnackbarErrorOpen(true);
+        setDeleteSnackbarErrorOpen(true)
       }
     } catch (error) {
       setDeleteDialogOpen(false)
-      setDeleteSnackbarErrorOpen(true);
+      setDeleteSnackbarErrorOpen(true)
     }
   }
 
   const handleOpenDialog = (id: string, name: string) => {
-    setSelectedAppointment({id, name})
+    setSelectedAppointment({ id, name })
     setDeleteDialogOpen(true)
   }
 
   const handleSnackbarSuccessClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
-      return;
+      return
     }
-    setDeleteSnackbarSuccessOpen(false);
+    setDeleteSnackbarSuccessOpen(false)
   }
 
   const handleSnackbarErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
-      return;
+      return
     }
-    setDeleteSnackbarErrorOpen(false);
+    setDeleteSnackbarErrorOpen(false)
   }
 
   return (
@@ -170,20 +169,20 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       <div className={Styles.centerBase}>
         <Snackbar
           severity={'success'}
-          successSnackbarOpen={deleteSnackbarSuccessOpen}
-          successMessage={'Agendamento excluido com sucesso!'}
-          handleSnackbarSuccessClose={() => handleSnackbarSuccessClose()}
+          open={deleteSnackbarSuccessOpen}
+          message={'Agendamento excluido com sucesso!'}
+          onClose={() => handleSnackbarSuccessClose()}
         />
         <Snackbar
           severity={'error'}
-          errorSnackbarOpen={deleteSnackbarErrorOpen}
-          errorMessage={'Erro ao excluir agendamento!'}
-          handleSnackbarErrorClose={() => handleSnackbarErrorClose()}
+          open={deleteSnackbarErrorOpen}
+          message={'Erro ao excluir agendamento!'}
+          onClose={() => handleSnackbarErrorClose()}
         />
         <AlertDialog
-          dialogStatus={deleteDialogOpen}
+          open={deleteDialogOpen}
           closeDialog={setDeleteDialogOpen}
-          handleConfirm={() => handleDeleteAppointmentSubmit()}
+          handleConfirm={async () => handleDeleteAppointmentSubmit()}
           title={'Deseja realmente excluir o agendamento?'}
           message={`O agendamento de ${selectedAppointment.name} será permanentemente excluido do sistema`}
         />

@@ -1,31 +1,38 @@
-import React from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import React from 'react'
+import { Snackbar, SnackbarProps } from '@mui/material'
+import MuiAlert, { AlertProps } from '@mui/material/Alert'
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert (
   props,
-  ref,
+  ref
 ) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+})
 
-export default function CustomizedSnackbars(props) {
+type Props = {
+  open: boolean
+  onClose: (event: React.SyntheticEvent<Element, Event>) => void
+  message: string
+  severity: string
+}
+
+export default function CustomizedSnackbars (props: Props) {
   return (
     <>
       {props.severity === 'success' && (
-      <Snackbar open={props.successSnackbarOpen} autoHideDuration={1500} onClose={props.handleSnackbarSuccessClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={props.handleSnackbarSuccessClose} severity="success" sx={{ width: '100%' }}>
-          {props.successMessage}
-        </Alert>
-      </Snackbar>
+        <Snackbar open={props.open} autoHideDuration={1500} onClose={props.onClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+          <Alert onClose={props.onClose} severity="success" sx={{ width: '100%' }}>
+            {props.message}
+          </Alert>
+        </Snackbar>
       )}
       {props.severity === 'error' && (
-      <Snackbar open={props.errorSnackbarOpen} autoHideDuration={1500} onClose={props.handleSnackbarErrorClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={props.handleSnackbarErrorClose} severity="error" sx={{ width: '100%' }}>
-        {props.errorMessage}
-        </Alert>
-      </Snackbar>
+        <Snackbar open={props.open} autoHideDuration={1500} onClose={props.onClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+          <Alert onClose={props.onClose} severity="error" sx={{ width: '100%' }}>
+            {props.message}
+          </Alert>
+        </Snackbar>
       )}
     </>
-  );
+  )
 }

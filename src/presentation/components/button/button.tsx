@@ -1,37 +1,43 @@
 import React from 'react'
-import { Button } from '@mui/material';
+import { Button, ButtonBaseProps } from '@mui/material'
 import Styles from './button-styles.scss'
 
-type Props = { [key: string]: any }
+type Props = {
+  disabled?: boolean
+  variant?: string
+  type?: string
+  buttonLabel: string
+  color?: string
+  onClick?: () => void
+}
 
 const SubmitButton: React.FC<Props> = (props: Props) => {
-
   return (
     <>
-    {props.type === "submit" && (
-    <div className={Styles.button}>
-      <Button
-        disabled={props.disabled}
-        variant="contained"
-        type={"submit"}
-      >
-        {props.text}
-      </Button>
-    </div>
-    )}
+      {props.type === 'submit' && (
+        <div className={Styles.button}>
+          <Button
+            disabled={props.disabled}
+            variant="contained"
+            type="submit"
+          >
+            {props.buttonLabel}
+          </Button>
+        </div>
+      )}
 
-  {props.type === "error" && (
-    <div className={Styles.button}>
-      <Button
-        disabled={props.disabled}
-        variant="contained"
-        color="error"
-        onClick={props.onClick}
-      >
-        {props.text}
-      </Button>
-    </div>
-    )}
+      {props.color === 'error' && (
+        <div className={Styles.button}>
+          <Button
+            disabled={props.disabled}
+            variant="contained"
+            color="error"
+            onClick={props.onClick}
+          >
+            {props.buttonLabel}
+          </Button>
+        </div>
+      )}
     </>
   )
 }

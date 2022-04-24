@@ -1,4 +1,4 @@
-import { AddAppointmentModel } from "../models";
+import { AddAppointmentModel } from '../models'
 import { AddAppointmentParams } from '@/domain/usecases'
 import faker from '@faker-js/faker'
 

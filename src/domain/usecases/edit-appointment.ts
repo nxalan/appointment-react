@@ -6,7 +6,7 @@ export type EditAppointmentParams = {
   appointment_date?: string
   status?: string
   status_comment?: string
-  
+
 }
 
 export interface EditAppointment {

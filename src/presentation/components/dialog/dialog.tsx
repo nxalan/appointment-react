@@ -1,23 +1,28 @@
-import React, { useEffect } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import React from 'react'
+import Button from '@mui/material/Button'
+import { Dialog } from '@mui/material'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 
-type Props = { [key: string]: any }
+type Props = {
+  message: string
+  open: boolean
+  closeDialog: React.Dispatch<React.SetStateAction<boolean>>
+  handleConfirm: () => Promise<void>
+  title: string
+}
 
-export default function AlertDialog(props: Props) {
-
+export default function AlertDialog (props: Props) {
   const handleClose = () => {
-    props.closeDialog(false);
-  };
+    props.closeDialog(false)
+  }
 
   return (
     <div>
       <Dialog
-        open={props.dialogStatus}
+        open={props.open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -36,5 +41,5 @@ export default function AlertDialog(props: Props) {
         </DialogActions>
       </Dialog>
     </div>
-  );
+  )
 }
