@@ -127,6 +127,7 @@ const InputText: React.FC<Props> = (props: Props) => {
             label={props.label}
             multiline
             fullWidth
+            disabled={props.disabled}
             rows={props.rows}
             {...props}
           />

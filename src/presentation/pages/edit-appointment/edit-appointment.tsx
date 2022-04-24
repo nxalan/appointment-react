@@ -142,6 +142,7 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
                 <Divider>Dados do Atendimento</Divider>
               </div>
               <Input
+                disabled={loading}
                 name="status"
                 type="radio"
                 value={props.values.status}
@@ -150,8 +151,10 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
               />
               {props.values.status === 'VACCINED' && (
                 <Input
+                  disabled={loading}
                   name="status_comment"
                   type="multiline"
+                  required
                   label="Conclusão do atendimento"
                   rows={4}
                   onChange={props.handleChange}
