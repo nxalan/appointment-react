@@ -1,19 +1,22 @@
-import { HttpDeleteClient, HttpStatusCode } from '@/data/protocols/http'
+import { HttpPostClient, HttpStatusCode } from '@/data/protocols/http'
 import { UnexpectedError } from '@/domain/errors'
+import { InvalidParamsError } from '@/domain/errors/invalid-params-error'
 import { AppointmentModel } from '@/domain/models'
-import { DeleteAppointment } from '@/domain/usecases'
+import { DeleteAppointment, DeleteAppointmentParams } from '@/domain/usecases'
 
 export class RemoteDeleteAppointment implements DeleteAppointment {
   constructor (
     private readonly url: string,
-    private readonly httpDeleteClient: HttpDeleteClient<AppointmentModel>
+    private readonly httpPostClient: HttpPostClient<AppointmentModel>
   ) {}
 
-  async delete (): Promise<AppointmentModel> {
-    const httpResponse = await this.httpDeleteClient.delete({
+  async delete (params: DeleteAppointmentParams): Promise<AppointmentModel> {
+    const httpResponse = await this.httpPostClient.post({
       url: this.url,
+      body: params
     })
     switch (httpResponse.statusCode) {
+      case HttpStatusCode.badRequest: throw new InvalidParamsError()
       case HttpStatusCode.ok: break
       default: throw new UnexpectedError()
     }

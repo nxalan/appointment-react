@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react"
-import { EditAppointment, LoadAppointment, LoadRestrictedDates, DeleteAppointment } from "@/domain/usecases"
-import { Footer, Header, Input, Button, FormStatus, Snackbar, AlertDialog } from '@/presentation/components'
-import { Formik, FormikHelpers } from 'formik'
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect } from 'react'
+import { EditAppointment, LoadAppointment, LoadRestrictedDates } from '@/domain/usecases'
+import { Footer, Header, Input, Button, Snackbar } from '@/presentation/components'
+import { Formik, FormikHelpers, FormikProps } from 'formik'
 import Styles from './edit-appointment-styles.scss'
-import { Link, useHistory } from 'react-router-dom'
-import { Divider } from "@mui/material"
+import { Link } from 'react-router-dom'
+import { Divider } from '@mui/material'
 
 type Props = {
   loadAppointment: LoadAppointment
   editAppointment: EditAppointment
   loadRestrictedDates: LoadRestrictedDates
-  deleteAppointment: DeleteAppointment
 }
 
-
-const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, loadRestrictedDates, deleteAppointment }: Props) => {
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [deleteDialogSuccessMessage, setDeleteDialogSuccessMessage] = useState(false)
-  const [deleteDialogErrorMessage, setDeleteDialogErrorMessage] = useState(false)
+const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment, loadRestrictedDates }: Props) => {
+  const [loading, setLoading] = useState(false)
+  const [refresh, setRefresh] = useState(0)
+  const [deleteSnackbarSuccessOpen, setDeleteSnackbarSuccessOpen] = useState(false)
+  const [deleteSnackbarErrorOpen, setDeleteSnackbarErrorOpen] = useState(false)
   const [currentAppointment, setCurrentAppointment] = useState({
     id: '',
     name: '',
@@ -26,47 +26,42 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
     status: '',
     status_comment: ''
   })
-  const history = useHistory()
 
   useEffect(() => {
+    setLoading(true)
     loadAppointment.load().then((appointment) => {
       setCurrentAppointment(appointment)
+      setLoading(false)
     })
-  }, [])
+  }, [refresh])
 
-    const handleDeleteAppointmentSubmit = async (): Promise<void> => {
-      console.log('rodei')
+  const handleSubmit = async (values: any, actions: FormikHelpers<any>): Promise<void> => {
     try {
-      const result = await deleteAppointment.delete()
-      if (result) {
-        setDeleteDialogOpen(false)
-        setDeleteDialogSuccessMessage(true)
-        setTimeout(() => {
-          history.push('/')
-        }, 2000);
-      }
-      else {
-        setDeleteDialogOpen(false)
-        setDeleteDialogErrorMessage(true);
-      }
+      setLoading(true)
+      await editAppointment.edit({
+        status: values.status,
+        status_comment: values.status === 'VACCINED' ? values.status_comment : ''
+      })
+      setRefresh(refresh + 1)
+      setDeleteSnackbarSuccessOpen(true)
     } catch (error) {
-      setDeleteDialogOpen(false)
-      setDeleteDialogErrorMessage(true);
+      setDeleteSnackbarErrorOpen(true)
     }
+    actions.setSubmitting(false)
   }
 
-  const handleDialogSuccessClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleSnackbarSuccessClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
-      return;
+      return
     }
-    setDeleteDialogErrorMessage(false);
+    setDeleteSnackbarSuccessOpen(false)
   }
 
-  const handleDialogErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleSnackbarErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
-      return;
+      return
     }
-    setDeleteDialogErrorMessage(false);
+    setDeleteSnackbarErrorOpen(false)
   }
 
   return (
@@ -75,35 +70,28 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
         <Header />
       </div>
       <div className={Styles.centerBase}>
-        
-        <Snackbar 
-        successMessage={deleteDialogSuccessMessage}
-        setSuccessMessage={setDeleteDialogSuccessMessage}
-        errorMessage={deleteDialogErrorMessage}
-        setErrorMessage={setDeleteDialogErrorMessage}
-        handleErrorClose={handleDialogSuccessClose}
-        handleSuccessClose={handleDialogErrorClose}
+        <Snackbar
+          severity={'success'}
+          open={deleteSnackbarSuccessOpen}
+          message={'Agendamento editado com sucesso!'}
+          onClose={() => handleSnackbarSuccessClose()}
         />
-     
-        <AlertDialog
-          dialogStatus={deleteDialogOpen}
-          closeDialog={setDeleteDialogOpen}
-          handleConfirm={() => handleDeleteAppointmentSubmit()}
-          title={'Deseja realmente excluir o agendamento?'}
-          message={`O agendamento de ${currentAppointment.name} será permanentemente excluido do sistema`}
+        <Snackbar
+          severity={'error'}
+          open={deleteSnackbarErrorOpen}
+          message={'Erro ao editar agendamento!'}
+          onClose={() => handleSnackbarErrorClose()}
         />
-
         <Formik
           enableReinitialize={true}
           initialValues={currentAppointment}
-          //validationSchema={AddAppointmentSchema}
-          //validateOnMount
+          // validationSchema={AddAppointmentSchema}
+          // validateOnMount
           onSubmit={(values, actions: FormikHelpers<any>) => {
-            console.log(values)
-            //handleSubmit(values, actions)
+            handleSubmit(values, actions)
           }}
         >
-          {props => (
+          {(props: FormikProps<any>) => (
             <form data-testid="form" className={Styles.form} onSubmit={props.handleSubmit}>
               <h2>Editar Agendamento</h2>
               <div className={Styles.divider}>
@@ -112,14 +100,13 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
               <Input
                 disabled
                 type="text"
-                fullWidth
                 name="name"
                 label="Nome"
                 placeholder="Digite seu nome"
                 onChange={props.handleChange}
                 onBlur={props.handleBlur}
                 value={props.values.name}
-                error={props.touched.name && props.errors?.name}
+                error={!!props.touched.name && !!props.errors?.name}
                 helperText={props.touched.name && props.errors?.name}
               />
               <Input
@@ -127,69 +114,56 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
                 type="date"
                 name="birthday"
                 value={props.values.birthday}
-                onChange={(value) => { props.setFieldValue('birthday', value); }}
+                onChange={(value) => { props.setFieldValue('birthday', value) }}
                 label="Data de Nascimento"
                 onBlur={props.handleBlur}
-                error={props.touched.birthday && props.errors.birthday}
+                error={!!props.touched.birthday && !!props.errors.birthday}
                 helperText={props.touched.birthday && props.errors.birthday}
               />
               <Input
                 disabled
-                //inputRef={inputRef}
+                // inputRef={inputRef}
                 type="dateTime"
                 name="appointment_date"
                 value={props.values.appointment_date}
-                onChange={(value) => { props.setFieldValue('appointment_date', value); }}
+                onChange={(value) => { props.setFieldValue('appointment_date', value) }}
                 label="Data de Agendamento"
                 onBlur={props.handleBlur}
-                //shouldDisableDate={disabledDays}
-                //shouldDisableTime={disabledHours}
+                // shouldDisableDate={disabledDays}
+                // shouldDisableTime={disabledHours}
                 minTime={new Date(0, 0, 0, 0, 0)}
                 maxTime={new Date(0, 0, 0, 23, 0)}
                 inputFormat='dd/MM/yyyy HH:00'
-                views={['year', 'month', 'day', 'hours']}
-                error={props.touched.appointment_date && props.errors.appointment_date}
+                dateViews={['year', 'month', 'day', 'hours']}
+                error={!!props.touched.appointment_date && !!props.errors.appointment_date}
                 helperText={props.touched.appointment_date && props.errors.appointment_date}
               />
               <div className={Styles.divider}>
                 <Divider>Dados do Atendimento</Divider>
               </div>
               <Input
+                name="status"
                 type="radio"
                 value={props.values.status}
                 onChange={props.handleChange}
-                radioLabels={[{ value: 'NOT VACCINED', label: 'NÃO ATENDIDO' }, { value: 'VACCINED', label: 'ATENDIDO' }]}
-                disabled={true}
+                radioLabels={[{ value: 'VACCINED', label: 'ATENDIDO' }, { value: 'NOT VACCINED', label: 'NÃO ATENDIDO' }]}
               />
-              <Input
-                type="multiline"
-                label="Conclusão do atendimento"
-                rows={4}
-                onChange={props.handleChange}
-                value={props.values.name}
-              />
+              {props.values.status === 'VACCINED' && (
+                <Input
+                  name="status_comment"
+                  type="multiline"
+                  label="Conclusão do atendimento"
+                  rows={4}
+                  onChange={props.handleChange}
+                  value={props.values.status_comment}
+                />
+              )}
               <Button
-                disabled={!props.isValid}
-                text="Alterar Dados"
+                disabled={!!props.isSubmitting}
+                buttonLabel="Alterar Dados"
                 type="submit"
               />
-              {/*
-              <FormStatus
-                isLoading={props.isSubmitting}
-                //hasError={formStatus.error}
-                //message={formStatus.message}
-              />
-          */}
-              <Link data-testid="login-link" to="/" className={Styles.link}>Voltar Para Agendamentos</Link>
-              <div className={Styles.divider}>
-                <Divider>Excluir Dados</Divider>
-              </div>
-              <Button
-                disabled={!props.isValid}
-                text="Excluir Agendamento"
-                type="error"
-                onClick={() => setDeleteDialogOpen(true)}
-              />
+              <Link data-testid="login-link" to="/agendamentos" className={Styles.link}>Voltar Para Agendamentos</Link>
             </form>
           )}
         </Formik>
@@ -201,4 +175,4 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
   )
 }
 
-export default EditAppointment
+export default EditAppointmentPage

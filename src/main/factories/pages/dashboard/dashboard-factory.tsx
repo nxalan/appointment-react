@@ -1,17 +1,13 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
-import { Dashboard } from '@/presentation/pages'
+import { DashboardPage } from '@/presentation/pages'
 import { makeRemoteLoadAppointments } from '@/main/factories/usecases/load-appointments/remote-load-appointments-factory'
 import { makeRemoteDeleteAppointment } from '@/main/factories/usecases/delete-appointment/remote-delete-appointment-factory'
 
-export const makeDashboard: React.FC = () => {
-  type Props = {
-    id: string
-  }
-  const { id } = useParams<Props>()
+export const makeDashboardPage: React.FC = () => {
   return (
-    <Dashboard
+    <DashboardPage
       loadAppointments={makeRemoteLoadAppointments()}
+      deleteAppointment={makeRemoteDeleteAppointment()}
     />
   )
 }

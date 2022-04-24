@@ -11,7 +11,7 @@ export class RemoteLoadRestrictedDates implements LoadRestrictedDates {
 
   async loadDates (): Promise<LoadRestrictedDatesModel> {
     const httpResponse = await this.httpGetClient.get({
-      url: this.url,
+      url: this.url
     })
     switch (httpResponse.statusCode) {
       case HttpStatusCode.ok: break

@@ -1,4 +1,4 @@
-import { LoadRestrictedDatesModel } from "@/domain/models";
+import { LoadRestrictedDatesModel } from '@/domain/models'
 import faker from '@faker-js/faker'
 
 export const mockLoadRestrictedDatesModel = (): LoadRestrictedDatesModel => ({

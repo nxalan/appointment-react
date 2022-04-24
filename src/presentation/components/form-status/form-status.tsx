@@ -3,8 +3,8 @@ import { Spinner } from '@/presentation/components'
 import Styles from './form-status-styles.scss'
 
 type Props = {
-  isLoading: boolean, 
-  hasError: boolean,
+  isLoading: boolean
+  hasError: boolean
   message: string
 }
 

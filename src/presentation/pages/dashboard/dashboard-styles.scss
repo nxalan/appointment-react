@@ -56,7 +56,12 @@
 }
 
 .editIcon {
-  color: $primaryLight;
+  color: $valid;
+  font-size: 20px;
+}
+
+.descriptionIcon {
+  color: $primary;
   font-size: 20px;
 }
 

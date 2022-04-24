@@ -1,4 +1,4 @@
-import { EditAppointmentModel } from "../models";
+import { EditAppointmentModel } from '../models'
 import faker from '@faker-js/faker'
 
 export const mockEditAppointmentParams = (): EditAppointmentModel => ({
