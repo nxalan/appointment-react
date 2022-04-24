@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 import React from 'react'
 import Styles from './input-styles.scss'
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField, TextFieldProps } from '@mui/material'
+import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material'
 import { registerLocale } from 'react-datepicker'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -127,7 +128,6 @@ const InputText: React.FC<Props> = (props: Props) => {
             multiline
             fullWidth
             rows={props.rows}
-            defaultValue=""
             {...props}
           />
         </div>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, ButtonBaseProps } from '@mui/material'
+import { Button } from '@mui/material'
 import Styles from './button-styles.scss'
 
 type Props = {

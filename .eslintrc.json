@@ -1,29 +1,26 @@
 {
   "env": {
-      "browser": true,
-      "es2021": true,
       "cypress/globals": true
-  },
+    },
   "extends": [
-      "standard-with-typescript",
+      "eslint:recommended",
       "plugin:react/recommended",
       "plugin:cypress/recommended"
-  ],
+    ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "project": "./tsconfig-eslint.json"
-  },
+      "project": "./tsconfig-eslint.json"
+    },
   "plugins": ["react", "cypress"],
   "rules": {
-    "@typescript-eslint/consistent-type-definitions": "off",
-    "@typescript-eslint/strict-boolean-expressions": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/comma-spacing": "off",
-    "@typescript-eslint/camelcase": "off",
-    "@typescript-eslint/return-await": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/no-unused-expressions": "off",
-    "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error"
-  }
+      "@typescript-eslint/consistent-type-definitions": "off",
+      "@typescript-eslint/strict-boolean-expressions": "off",
+      "@typescript-eslint/comma-spacing": "off",
+      "@typescript-eslint/camelcase": "off",
+      "@typescript-eslint/return-await": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+      "react/jsx-uses-react": "error",
+      "react/jsx-uses-vars": "error"
+    }
 }

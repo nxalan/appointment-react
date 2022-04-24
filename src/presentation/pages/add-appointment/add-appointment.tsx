@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import React, { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Styles from './add-appointment-styles.scss'
@@ -19,7 +18,7 @@ type Props = {
   loadRestrictedDates: LoadRestrictedDates
 }
 
-const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }: Props) => {
+const AddAppointmentPage: React.FC<Props> = ({ addAppointment, loadRestrictedDates }: Props) => {
   const [restrictedDates, setRestrictedDates] = useState({
     restrictedDays: [],
     restrictedHours: []
@@ -149,7 +148,7 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
                 hasError={formStatus.error}
                 message={formStatus.message}
               />
-              <Link data-testid="login-link" to="/" className={Styles.link}>Voltar Para Agendamentos</Link>
+              <Link data-testid="login-link" to="/agendamentos" className={Styles.link}>Voltar Para Agendamentos</Link>
             </form>
           )}
         </Formik>
@@ -161,4 +160,4 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
   )
 }
 
-export default AddAppointment
+export default AddAppointmentPage

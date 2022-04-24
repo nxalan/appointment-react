@@ -6,7 +6,7 @@ import { MdPersonAddAlt1 } from 'react-icons/md'
 import { Link } from 'react-router-dom'
 
 export const navMap = [
-  { name: 'Listar Agendamentos', to: '/', icon: <IoMdPeople /> },
+  { name: 'Listar Agendamentos', to: '/agendamentos', icon: <IoMdPeople /> },
   { name: 'Adicionar Agendamento', to: '/agendamento', icon: <MdPersonAddAlt1 /> }
 ]
 

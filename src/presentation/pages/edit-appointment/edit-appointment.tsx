@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { EditAppointment, LoadAppointment, LoadRestrictedDates } from '@/domain/usecases'
-import { Footer, Header, Input, Button, FormStatus, Snackbar } from '@/presentation/components'
+import { Footer, Header, Input, Button, Snackbar } from '@/presentation/components'
 import { Formik, FormikHelpers, FormikProps } from 'formik'
 import Styles from './edit-appointment-styles.scss'
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Divider } from '@mui/material'
 
 type Props = {
@@ -12,7 +13,7 @@ type Props = {
   loadRestrictedDates: LoadRestrictedDates
 }
 
-const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, loadRestrictedDates }: Props) => {
+const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment, loadRestrictedDates }: Props) => {
   const [loading, setLoading] = useState(false)
   const [refresh, setRefresh] = useState(0)
   const [deleteSnackbarSuccessOpen, setDeleteSnackbarSuccessOpen] = useState(false)
@@ -162,14 +163,7 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
                 buttonLabel="Alterar Dados"
                 type="submit"
               />
-              {/*
-              <FormStatus
-                isLoading={props.isSubmitting}
-                //hasError={formStatus.error}
-                //message={formStatus.message}
-              />
-              */}
-              <Link data-testid="login-link" to="/" className={Styles.link}>Voltar Para Agendamentos</Link>
+              <Link data-testid="login-link" to="/agendamentos" className={Styles.link}>Voltar Para Agendamentos</Link>
             </form>
           )}
         </Formik>
@@ -181,4 +175,4 @@ const EditAppointment: React.FC<Props> = ({ loadAppointment, editAppointment, lo
   )
 }
 
-export default EditAppointment
+export default EditAppointmentPage

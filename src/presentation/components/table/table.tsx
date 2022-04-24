@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
 import { alpha, styled } from '@mui/material/styles'
 import Styles from './table-styles.scss'
-import { DataGrid, gridClasses, ptBR, DataGridProps, GridCallbackDetails, GridValidRowModel, GridColumns } from '@mui/x-data-grid'
+import { DataGrid, gridClasses, ptBR, GridCallbackDetails, GridValidRowModel, GridColumns } from '@mui/x-data-grid'
 
 type Props = {
   loading: boolean

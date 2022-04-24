@@ -3,7 +3,7 @@ import { DeleteAppointment, LoadAppointments } from '@/domain/usecases'
 import { Header, Footer, Table, Snackbar, AlertDialog } from '@/presentation/components'
 import Styles from './dashboard-styles.scss'
 import IconButton from '@mui/material/IconButton'
-import { MdEdit, MdDelete } from 'react-icons/md'
+import { MdEdit, MdDelete, MdDescription } from 'react-icons/md'
 import Tooltip from '@mui/material/Tooltip'
 import { GridColDef, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid'
 import { format } from 'date-fns'
@@ -14,10 +14,18 @@ type Props = {
   deleteAppointment: DeleteAppointment
 }
 
-const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Props) => {
+const DashboardPage: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Props) => {
   const [appointmentsList, setAppointmentsList] = useState([])
-  const [selectedAppointment, setSelectedAppointment] = useState({ id: '', name: '' })
+  const [selectedAppointment, setSelectedAppointment] = useState({ 
+    id: '',
+    name: '' ,
+    birthday: null,
+    appointment_date: null,
+    status: '',
+    status_comment: ''
+  })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false)
   const [deleteSnackbarSuccessOpen, setDeleteSnackbarSuccessOpen] = useState(false)
   const [deleteSnackbarErrorOpen, setDeleteSnackbarErrorOpen] = useState(false)
   const [gridPage, setGridPage] = useState(0)
@@ -33,15 +41,15 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
     })
   }, [refresh])
 
-  function getAppointmentDate (params) {
+  function getAppointmentDate(params) {
     return format(new Date(params.row.appointment_date), 'dd/MM/yyyy')
   }
 
-  function getAppointmentTime (params) {
+  function getAppointmentTime(params) {
     return format(new Date(params.row.appointment_date), 'HH:mm')
   }
 
-  function getStatusTranslated (params) {
+  function getStatusTranslated(params) {
     let message = ''
     switch (params.row.status) {
       case 'NOT VACCINED':
@@ -73,7 +81,7 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
             </IconButton>
           </Tooltip>
           <Tooltip title="Excluir">
-            <IconButton disabled={loading} onClick={() => handleOpenDialog(params.row.id, params.row.name)}>
+            <IconButton disabled={loading} onClick={() => handleOpenDeleteDialog(params.row)}>
               <MdDelete className={Styles.deleteIcon} />
             </IconButton>
           </Tooltip>
@@ -119,34 +127,46 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       field: 'status-translated',
       headerName: 'Status',
       headerAlign: 'center',
-      flex: 0.5,
+      flex: 0.8,
       align: 'center',
-      valueGetter: getStatusTranslated
-    }
+      renderCell: (params: GridRenderCellParams<Date>) => (
+        <>
+          {getStatusTranslated(params)}
+          {params.row.status === 'VACCINED' && (
+            <Tooltip title="Conclusão do Atendimento">
+              <IconButton disabled={loading} onClick={() => handleOpenStatusDialog(params.row)}>
+                <MdDescription className={Styles.descriptionIcon} />
+              </IconButton>
+            </Tooltip>
+          )}
+        </>
+      ) 
+    },
   ]
 
   const handleDeleteAppointmentSubmit = async (): Promise<void> => {
-    setLoading(true)
-    try {
-      const result = await deleteAppointment.delete({ id: selectedAppointment.id })
-      if (result) {
-        setDeleteDialogOpen(false)
+    if (!loading) {
+      setLoading(true)
+      setDeleteDialogOpen(false)
+      try {
+        await deleteAppointment.delete({ id: selectedAppointment.id })
         setRefresh(refresh + 1)
         setDeleteSnackbarSuccessOpen(true)
-      } else {
-        setDeleteDialogOpen(false)
+      } catch (error) {
         setDeleteSnackbarErrorOpen(true)
       }
-    } catch (error) {
-      setDeleteDialogOpen(false)
-      setDeleteSnackbarErrorOpen(true)
+      setLoading(false)
     }
-    setLoading(false)
   }
 
-  const handleOpenDialog = (id: string, name: string) => {
-    setSelectedAppointment({ id, name })
+  const handleOpenDeleteDialog = (appointment) => {
+    setSelectedAppointment(appointment)
     setDeleteDialogOpen(true)
+  }
+
+  const handleOpenStatusDialog = (appointment) => {
+    setSelectedAppointment(appointment)
+    setStatusDialogOpen(true)
   }
 
   const handleSnackbarSuccessClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -182,11 +202,19 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
           onClose={() => handleSnackbarErrorClose()}
         />
         <AlertDialog
+          type="dialogConfirmation"
           open={deleteDialogOpen}
           closeDialog={setDeleteDialogOpen}
           handleConfirm={async () => handleDeleteAppointmentSubmit()}
           title={'Deseja realmente excluir o agendamento?'}
           message={`O agendamento de ${selectedAppointment.name} será permanentemente excluido do sistema`}
+        />
+        <AlertDialog
+          type="dialogInformation"
+          open={statusDialogOpen}
+          closeDialog={setStatusDialogOpen}
+          title={`Como foi a conclusão do atendimento de ${selectedAppointment.name}`}
+          message={selectedAppointment.status_comment}
         />
         <Table
           rows={appointmentsList}
@@ -203,4 +231,4 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
   )
 }
 
-export default Dashboard
+export default DashboardPage
