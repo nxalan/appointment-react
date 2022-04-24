@@ -7,29 +7,31 @@ import { MdEdit, MdDelete } from 'react-icons/md';
 import Tooltip from "@mui/material/Tooltip";
 import { GridColDef, GridRenderCellParams, GridValueFormatterParams } from '@mui/x-data-grid';
 import { format } from 'date-fns'
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import { useHistory } from "react-router-dom";
 
 type Props = {
   loadAppointments: LoadAppointments
+  deleteAppointment: DeleteAppointment
 }
 
-const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
-  props,
-  ref,
-) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-
-const Dashboard: React.FC<Props> = ({ loadAppointments }: Props) => {
+const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Props) => {
   const [appointmentsList, setAppointmentsList] = useState([])
+  const [selectedAppointment, setSelectedAppointment] = useState({id: '', name: ''})
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deleteSnackbarSuccessOpen, setDeleteSnackbarSuccessOpen] = useState(false)
+  const [deleteSnackbarErrorOpen, setDeleteSnackbarErrorOpen] = useState(false)
+  const [gridPage, setGridPage] = useState(0)
+  const [refresh, setRefresh] = useState(0)
+  const [loading, setLoading] = useState(false)
   const history = useHistory()
 
   useEffect(() => {
+    setLoading(true)
     loadAppointments.loadAll().then((appointments) => {
       setAppointmentsList(appointments)
+      setLoading(false)
     })
-  }, [])
+  }, [refresh])
 
   function getAppointmentDate(params) {
     return format(new Date(params.row.appointment_date), 'dd/MM/yyyy');
@@ -68,6 +70,11 @@ const Dashboard: React.FC<Props> = ({ loadAppointments }: Props) => {
           <Tooltip title="Editar">
             <IconButton onClick={() => history.push(`/agendamento/${params.row.id}`)}>
               <MdEdit className={Styles.editIcon} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Excluir">
+            <IconButton onClick={() => handleOpenDialog(params.row.id, params.row.name)}>
+              <MdDelete className={Styles.deleteIcon} />
             </IconButton>
           </Tooltip>
         </>
@@ -118,15 +125,74 @@ const Dashboard: React.FC<Props> = ({ loadAppointments }: Props) => {
     }
   ];
 
+  const handleDeleteAppointmentSubmit = async (): Promise<void> => {
+    try {
+      const result = await deleteAppointment.delete({ id: selectedAppointment.id })
+      if (result) {
+        setDeleteDialogOpen(false)
+        setRefresh(refresh + 1)
+        setDeleteSnackbarSuccessOpen(true)
+      }
+      else {
+        setDeleteDialogOpen(false)
+        setDeleteSnackbarErrorOpen(true);
+      }
+    } catch (error) {
+      setDeleteDialogOpen(false)
+      setDeleteSnackbarErrorOpen(true);
+    }
+  }
+
+  const handleOpenDialog = (id: string, name: string) => {
+    setSelectedAppointment({id, name})
+    setDeleteDialogOpen(true)
+  }
+
+  const handleSnackbarSuccessClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setDeleteSnackbarSuccessOpen(false);
+  }
+
+  const handleSnackbarErrorClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setDeleteSnackbarErrorOpen(false);
+  }
+
   return (
     <div className={Styles.root}>
       <div className={Styles.headerBase}>
         <Header />
       </div>
       <div className={Styles.centerBase}>
+        <Snackbar
+          severity={'success'}
+          successSnackbarOpen={deleteSnackbarSuccessOpen}
+          successMessage={'Agendamento excluido com sucesso!'}
+          handleSnackbarSuccessClose={() => handleSnackbarSuccessClose()}
+        />
+        <Snackbar
+          severity={'error'}
+          errorSnackbarOpen={deleteSnackbarErrorOpen}
+          errorMessage={'Erro ao excluir agendamento!'}
+          handleSnackbarErrorClose={() => handleSnackbarErrorClose()}
+        />
+        <AlertDialog
+          dialogStatus={deleteDialogOpen}
+          closeDialog={setDeleteDialogOpen}
+          handleConfirm={() => handleDeleteAppointmentSubmit()}
+          title={'Deseja realmente excluir o agendamento?'}
+          message={`O agendamento de ${selectedAppointment.name} será permanentemente excluido do sistema`}
+        />
         <Table
           rows={appointmentsList}
           columns={columns}
+          page={gridPage}
+          onPageChange={setGridPage}
+          loading={loading}
         />
       </div>
       <div className={Styles.footerBase}>

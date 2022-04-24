@@ -77,14 +77,15 @@ const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
           <FormControl>
             <FormLabel id="demo-controlled-radio-buttons-group">{props.title}</FormLabel>
             <RadioGroup
+              name={props.name}
               row
               aria-labelledby="controlled-radio-buttons-group"
-              name="controlled-radio-button"
               value={props.value}
               onChange={props.onChange}
             >
               {props.radioLabels.map((el) => (
                 <FormControlLabel
+                  key={el.value}
                   value={el.value}
                   control={<Radio />}
                   label={el.label}
@@ -98,12 +99,14 @@ const InputText: React.FC<Props> = (props: Props & { inputType: string }) => {
       {props.type === 'multiline' && (
         <div className={Styles.multilineField}>
           <TextField
+            name={props.name}
             id="outlined-multiline-static"
             label={props.label}
             multiline
             fullWidth
             rows={props.rows}
             defaultValue=""
+            {...props}
           />
         </div>
       )}

@@ -46,6 +46,9 @@ const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
       <div className={Styles.formContent}>
         <div style={{ flexGrow: 1 }}>
           <StripedDataGrid
+            loading={props.loading}
+            page={props.page}
+            onPageChange={(newPage) => props.onPageChange(newPage)}
             localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
             autoHeight
             rows={props.rows ? props.rows : []}

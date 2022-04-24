@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
+import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
@@ -14,16 +12,20 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 export default function CustomizedSnackbars(props) {
   return (
     <>
-      <Snackbar open={props.successMessage} autoHideDuration={3000} onClose={props.handleSuccessClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={props.handleSuccessClose} severity="success" sx={{ width: '100%' }}>
-          Agendamento excluido com sucesso! Redirecionando para a página principal
+      {props.severity === 'success' && (
+      <Snackbar open={props.successSnackbarOpen} autoHideDuration={1500} onClose={props.handleSnackbarSuccessClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={props.handleSnackbarSuccessClose} severity="success" sx={{ width: '100%' }}>
+          {props.successMessage}
         </Alert>
       </Snackbar>
-      <Snackbar open={props.errorMessage} autoHideDuration={3000} onClose={props.handleErrorClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-        <Alert onClose={props.handleErrorClose} severity="error" sx={{ width: '100%' }}>
-          Erro ao excluir agendamento!
+      )}
+      {props.severity === 'error' && (
+      <Snackbar open={props.errorSnackbarOpen} autoHideDuration={1500} onClose={props.handleSnackbarErrorClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={props.handleSnackbarErrorClose} severity="error" sx={{ width: '100%' }}>
+        {props.errorMessage}
         </Alert>
       </Snackbar>
+      )}
     </>
   );
 }

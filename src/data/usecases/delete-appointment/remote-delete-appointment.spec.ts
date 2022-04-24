@@ -1,59 +1,62 @@
 import { RemoteDeleteAppointment } from './remote-delete-appointment'
-import { HttpDeleteClientSpy } from '@/data/test'
+import { HttpPostClientSpy } from '@/data/test'
 import { UnexpectedError } from '@/domain/errors'
 import faker from '@faker-js/faker'
 import { HttpStatusCode } from '@/data/protocols/http'
 import { AppointmentModel } from '@/domain/models'
+import { DeleteAppointmentParams } from '@/domain/usecases'
 import { mockAppointmentModel } from '@/domain/test'
 
 type SutTypes = {
   sut: RemoteDeleteAppointment
-  httpDeleteClientSpy: HttpDeleteClientSpy<AppointmentModel>
+  httpPostClientSpy: HttpPostClientSpy<DeleteAppointmentParams, AppointmentModel>
 }
 
 const makeSut = (url: string = faker.internet.url()): SutTypes => {
-  const httpDeleteClientSpy = new HttpDeleteClientSpy<AppointmentModel>()
-  const sut = new RemoteDeleteAppointment(url, httpDeleteClientSpy)
+  const httpPostClientSpy = new HttpPostClientSpy<DeleteAppointmentParams, AppointmentModel>()
+  const sut = new RemoteDeleteAppointment(url, httpPostClientSpy)
   return {
     sut,
-    httpDeleteClientSpy
+    httpPostClientSpy
   }
 }
 
 describe('RemoteAuthentication', () => {
-  test('Should call HttpGetClient with correct URL', async () => {
+  test('Should call HttpGetClient with correct URL and value', async () => {
     const url = faker.internet.url()
-    const { sut, httpDeleteClientSpy } = makeSut(url)
-    await sut.delete()
-    expect(httpDeleteClientSpy.url).toBe(url)
+    const id = faker.datatype.uuid()
+    const { sut, httpPostClientSpy } = makeSut(url)
+    await sut.delete({ id })
+    expect(httpPostClientSpy.url).toBe(url)
+    expect(httpPostClientSpy.body).toEqual({ id: id })
   })
 
   test('Should throw UnexpectedError if HttpGetClient returns 500', async () => {
-    const { sut, httpDeleteClientSpy } = makeSut()
-    httpDeleteClientSpy.response = {
+    const { sut, httpPostClientSpy } = makeSut()
+    httpPostClientSpy.response = {
       statusCode: HttpStatusCode.serverError
     }
-    const promise = sut.delete()
+    const promise = sut.delete({ id: faker.datatype.uuid() })
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
 
   test('Should throw UnexpectedError if HttpGetClient returns 404', async () => {
-    const { sut, httpDeleteClientSpy } = makeSut()
-    httpDeleteClientSpy.response = {
+    const { sut, httpPostClientSpy } = makeSut()
+    httpPostClientSpy.response = {
       statusCode: HttpStatusCode.notFound
     }
-    const promise = sut.delete()
+    const promise = sut.delete({ id: faker.datatype.uuid() })
     await expect(promise).rejects.toThrow(new UnexpectedError())
   })
 
   test('Should return an AppointmentModel if HttpGetClient returns 200', async () => {
-    const { sut, httpDeleteClientSpy } = makeSut()
+    const { sut, httpPostClientSpy } = makeSut()
     const httpResult = mockAppointmentModel()
-    httpDeleteClientSpy.response = {
+    httpPostClientSpy.response = {
       statusCode: HttpStatusCode.ok,
       body: httpResult
     }
-    const appointment = await sut.delete()
+    const appointment = await sut.delete({ id: faker.datatype.uuid() })
     expect(appointment).toEqual(httpResult)
   })
 })

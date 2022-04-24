@@ -63,7 +63,7 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
 
   const handleSubmit = async (values: any, actions: FormikHelpers<any>): Promise<void> => {
     try {
-      const appointment = await addAppointment.add({
+      await addAppointment.add({
         name: values.name,
         birthday: new Date(values.birthday).toISOString(),
         appointment_date: new Date(values.appointment_date).toISOString(),
@@ -97,8 +97,7 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
               <h2>Criar Novo Agendamento</h2>
               <Input
                 disabled={props.isSubmitting}
-                inputType='text'
-                type="text"
+                type='text'
                 fullWidth
                 name="name"
                 label="Nome"
@@ -112,7 +111,7 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
               />
               <Input
                 disabled={props.isSubmitting}
-                inputType='date'
+                type='date'
                 name="birthday"
                 value={props.values.birthday}
                 onChange={(value) => { props.setFieldValue('birthday', value); }}
@@ -125,7 +124,7 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
               <Input
                 disabled={props.isSubmitting}
                 inputRef={inputRef}
-                inputType='dateTime'
+                type='dateTime'
                 name="appointment_date"
                 value={props.values.appointment_date}
                 onChange={(value) => { props.setFieldValue('appointment_date', value); }}
