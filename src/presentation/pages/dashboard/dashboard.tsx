@@ -68,12 +68,12 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       renderCell: (params: GridRenderCellParams<Date>) => (
         <>
           <Tooltip title="Editar">
-            <IconButton onClick={() => history.push(`/agendamento/${params.row.id}`)}>
+            <IconButton disabled={loading} onClick={() => history.push(`/agendamento/${params.row.id}`)}>
               <MdEdit className={Styles.editIcon} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Excluir">
-            <IconButton onClick={() => handleOpenDialog(params.row.id, params.row.name)}>
+            <IconButton disabled={loading} onClick={() => handleOpenDialog(params.row.id, params.row.name)}>
               <MdDelete className={Styles.deleteIcon} />
             </IconButton>
           </Tooltip>
@@ -126,6 +126,7 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
   ]
 
   const handleDeleteAppointmentSubmit = async (): Promise<void> => {
+    setLoading(true)
     try {
       const result = await deleteAppointment.delete({ id: selectedAppointment.id })
       if (result) {
@@ -140,6 +141,7 @@ const Dashboard: React.FC<Props> = ({ loadAppointments, deleteAppointment }: Pro
       setDeleteDialogOpen(false)
       setDeleteSnackbarErrorOpen(true)
     }
+    setLoading(false)
   }
 
   const handleOpenDialog = (id: string, name: string) => {

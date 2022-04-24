@@ -6,7 +6,7 @@ import { Footer, Header, Input, Button, FormStatus } from '@/presentation/compon
 import { AddAppointment, LoadRestrictedDates } from '@/domain/usecases'
 import { Formik, FormikHelpers, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { getHours, isSameDay } from 'date-fns'
+import { getHours, isSameDay, startOfHour } from 'date-fns'
 
 const AddAppointmentSchema = Yup.object().shape({
   name: Yup.string().required('Campo obrigatório'),
@@ -66,7 +66,7 @@ const AddAppointment: React.FC<Props> = ({ addAppointment, loadRestrictedDates }
       await addAppointment.add({
         name: values.name,
         birthday: new Date(values.birthday).toISOString(),
-        appointment_date: new Date(values.appointment_date).toISOString()
+        appointment_date: startOfHour(new Date(values.appointment_date)).toISOString()
       })
       setFormStatus({ error: false, message: `Agendamento de ${values.name} criado com sucesso!` })
       actions.setSubmitting(false)
