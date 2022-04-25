@@ -29,6 +29,7 @@
 * Material-UI (MIUI)
 * Deploy no Heroku
 * Calendário desativa dinamicamente as datas e horários cheios
+* Integração com o backend
 
 > ## Como iniciar a aplicação
 
