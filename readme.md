@@ -27,6 +27,7 @@
 * Validações com Yup
 * DatePicker
 * Material-UI (MIUI)
+* Formulários com Formik
 * Deploy no Heroku
 * Calendário desativa dinamicamente as datas e horários cheios
 * Integração com o backend
