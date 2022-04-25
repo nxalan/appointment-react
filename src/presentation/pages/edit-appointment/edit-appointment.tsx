@@ -1,11 +1,19 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import * as Yup from 'yup'
 import { EditAppointment, LoadAppointment, LoadRestrictedDates } from '@/domain/usecases'
-import { Footer, Header, Input, Button, Snackbar } from '@/presentation/components'
+import { Footer, Header, Input, Button, Snackbar, Spinner } from '@/presentation/components'
 import { Formik, FormikHelpers, FormikProps } from 'formik'
 import Styles from './edit-appointment-styles.scss'
 import { Link } from 'react-router-dom'
 import { Divider } from '@mui/material'
+import { getHours, isEqual, isSameDay, startOfHour } from 'date-fns'
+import { useHistory } from 'react-router-dom'
+
+const EditAppointmentSchema = Yup.object().shape({
+  birthday: Yup.date().typeError('Digite uma data válida').default(null),
+  appointment_date: Yup.date().typeError('Digite uma data válida')
+})
 
 type Props = {
   loadAppointment: LoadAppointment
@@ -16,6 +24,10 @@ type Props = {
 const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment, loadRestrictedDates }: Props) => {
   const [loading, setLoading] = useState(false)
   const [refresh, setRefresh] = useState(0)
+  const [restrictedDates, setRestrictedDates] = useState({
+    restrictedDays: [],
+    restrictedHours: []
+  })
   const [deleteSnackbarSuccessOpen, setDeleteSnackbarSuccessOpen] = useState(false)
   const [deleteSnackbarErrorOpen, setDeleteSnackbarErrorOpen] = useState(false)
   const [currentAppointment, setCurrentAppointment] = useState({
@@ -26,27 +38,69 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
     status: '',
     status_comment: ''
   })
+  const inputRef = useRef(null)
+  const history = useHistory()
 
   useEffect(() => {
-    setLoading(true)
-    loadAppointment.load().then((appointment) => {
+    async function refreshAppointments() {
+      setLoading(true)
+      try {
+      const appointment = await loadAppointment.load()
+      let currentRestrictedDates = await loadRestrictedDates.loadDates()
+      const filteredDays = currentRestrictedDates.restrictedDays.filter((eachDay) => !isEqual(new Date(appointment.appointment_date), new Date(eachDay)))
+      const filteredHours = currentRestrictedDates.restrictedHours.filter((eachHour) => !isEqual(new Date(appointment.appointment_date), new Date(eachHour)))
+      currentRestrictedDates = {restrictedDays: filteredDays, restrictedHours: filteredHours}
       setCurrentAppointment(appointment)
-      setLoading(false)
-    })
+      setRestrictedDates(currentRestrictedDates)
+    } catch (error) {
+      history.push('/agendamento')
+    }
+    setLoading(false)
+    }
+    refreshAppointments()
   }, [refresh])
+
+
+  function disabledDays (date) {
+    let disabledDay = false
+    restrictedDates.restrictedDays.forEach((actualDate) => {
+      disabledDay = isSameDay(new Date(date), new Date(actualDate))
+    })
+    return disabledDay
+  }
+
+  function disabledHours (date) {
+    let disabledHour = false
+    if (inputRef.current && inputRef.current.value) {
+      const formatedDay = inputRef.current.value.substr(3, 2) + '/' + inputRef.current.value.substr(0, 2) + '/' + inputRef.current.value.substr(6, 4)
+      const RestrictedDatesInTheSameDay = restrictedDates.restrictedHours.filter((actualDate) => (
+        isSameDay(new Date(formatedDay), new Date(actualDate))
+      ))
+      RestrictedDatesInTheSameDay.forEach((actualDate) => {
+        if (getHours(new Date(actualDate)) === date) {
+          disabledHour = true
+        }
+      })
+    }
+    return disabledHour
+  }
 
   const handleSubmit = async (values: any, actions: FormikHelpers<any>): Promise<void> => {
     try {
       setLoading(true)
       await editAppointment.edit({
+        name: values.name,
+        birthday: new Date(values.birthday).toISOString(),
+        appointment_date: compareDatesAndReturnTheFirstIfDifferent(values.appointment_date, currentAppointment.appointment_date),
         status: values.status,
-        status_comment: values.status === 'VACCINED' ? values.status_comment : ''
+        status_comment: values.status === 'VACCINED' ? values.status_comment : '',
       })
       setRefresh(refresh + 1)
       setDeleteSnackbarSuccessOpen(true)
     } catch (error) {
       setDeleteSnackbarErrorOpen(true)
     }
+    setLoading(false)
     actions.setSubmitting(false)
   }
 
@@ -62,6 +116,14 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
       return
     }
     setDeleteSnackbarErrorOpen(false)
+  }
+
+  function compareDatesAndReturnTheFirstIfDifferent(date1: string, date2: string) {
+    let result = startOfHour(new Date(date1)).toISOString()
+    if (isEqual(startOfHour(new Date(date1)), startOfHour(new Date(date2)))) {
+      result = undefined
+    }
+    return result
   }
 
   return (
@@ -85,8 +147,8 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
         <Formik
           enableReinitialize={true}
           initialValues={currentAppointment}
-          // validationSchema={AddAppointmentSchema}
-          // validateOnMount
+          validationSchema={EditAppointmentSchema}
+          validateOnMount
           onSubmit={(values, actions: FormikHelpers<any>) => {
             handleSubmit(values, actions)
           }}
@@ -98,7 +160,6 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
                 <Divider>Dados do Agendamento</Divider>
               </div>
               <Input
-                disabled
                 type="text"
                 name="name"
                 label="Nome"
@@ -108,9 +169,9 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
                 value={props.values.name}
                 error={!!props.touched.name && !!props.errors?.name}
                 helperText={props.touched.name && props.errors?.name}
+                disabled={props.isSubmitting || loading}
               />
               <Input
-                disabled
                 type="date"
                 name="birthday"
                 value={props.values.birthday}
@@ -119,29 +180,31 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
                 onBlur={props.handleBlur}
                 error={!!props.touched.birthday && !!props.errors.birthday}
                 helperText={props.touched.birthday && props.errors.birthday}
+                disabled={props.isSubmitting || loading}
               />
               <Input
-                disabled
-                // inputRef={inputRef}
+                inputRef={inputRef}
                 type="dateTime"
                 name="appointment_date"
                 value={props.values.appointment_date}
                 onChange={(value) => { props.setFieldValue('appointment_date', value) }}
                 label="Data de Agendamento"
                 onBlur={props.handleBlur}
-                // shouldDisableDate={disabledDays}
-                // shouldDisableTime={disabledHours}
+                shouldDisableDate={disabledDays}
+                shouldDisableTime={disabledHours}
                 minTime={new Date(0, 0, 0, 0, 0)}
                 maxTime={new Date(0, 0, 0, 23, 0)}
                 inputFormat='dd/MM/yyyy HH:00'
                 dateViews={['year', 'month', 'day', 'hours']}
                 error={!!props.touched.appointment_date && !!props.errors.appointment_date}
                 helperText={props.touched.appointment_date && props.errors.appointment_date}
+                disabled={props.isSubmitting || loading}
               />
               <div className={Styles.divider}>
                 <Divider>Dados do Atendimento</Divider>
               </div>
               <Input
+                disabled={props.isSubmitting || loading}
                 name="status"
                 type="radio"
                 value={props.values.status}
@@ -150,8 +213,10 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
               />
               {props.values.status === 'VACCINED' && (
                 <Input
+                disabled={props.isSubmitting || loading}
                   name="status_comment"
                   type="multiline"
+                  required
                   label="Conclusão do atendimento"
                   rows={4}
                   onChange={props.handleChange}
@@ -159,9 +224,15 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
                 />
               )}
               <Button
-                disabled={!!props.isSubmitting}
+                disabled={props.isSubmitting || loading || Object.is(props.values, currentAppointment)}
                 buttonLabel="Alterar Dados"
                 type="submit"
+              />
+              <Button
+                disabled={props.isSubmitting || loading || Object.is(props.values, currentAppointment)}
+                buttonLabel="Resetar Dados"
+                type="reset"
+                onClick={() => props.setValues(currentAppointment)}
               />
               <Link data-testid="login-link" to="/agendamentos" className={Styles.link}>Voltar Para Agendamentos</Link>
             </form>

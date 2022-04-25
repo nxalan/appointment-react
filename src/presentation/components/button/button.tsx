@@ -39,6 +39,18 @@ const SubmitButton: React.FC<Props> = (props: Props) => {
           </Button>
         </div>
       )}
+
+      {props.type === 'reset' && (
+        <div className={Styles.button}>
+          <Button
+            disabled={props.disabled}
+            variant="outlined"
+            onClick={props.onClick}
+          >
+            {props.buttonLabel}
+          </Button>
+        </div>
+      )}
     </>
   )
 }

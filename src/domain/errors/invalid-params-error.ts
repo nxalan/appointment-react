@@ -1,6 +1,6 @@
 export class InvalidParamsError extends Error {
   constructor () {
-    super('Digite um valor válido')
-    this.name = 'InvalidParamsError'
+    super('Formulário com parametros inválidos, corrija e tente novamente')
+    this.name = 'Erro'
   }
 }
