@@ -95,7 +95,7 @@ const AddAppointmentPage: React.FC<Props> = ({ addAppointment, loadRestrictedDat
             <form data-testid="form" className={Styles.form} onSubmit={props.handleSubmit}>
               <h2>Criar Novo Agendamento</h2>
               <Input
-                disabled={!!props.isSubmitting}
+                disabled={props.isSubmitting}
                 type='text'
                 name="name"
                 label="Nome"
@@ -108,7 +108,7 @@ const AddAppointmentPage: React.FC<Props> = ({ addAppointment, loadRestrictedDat
                 helperText={props.touched.name ? props.errors.name : ''}
               />
               <Input
-                disabled={!!props.isSubmitting}
+                disabled={props.isSubmitting}
                 type='date'
                 name="birthday"
                 value={props.values.birthday}
@@ -120,7 +120,7 @@ const AddAppointmentPage: React.FC<Props> = ({ addAppointment, loadRestrictedDat
                 required
               />
               <Input
-                disabled={!!props.isSubmitting}
+                disabled={props.isSubmitting}
                 inputRef={inputRef}
                 type='dateTime'
                 name="appointment_date"
