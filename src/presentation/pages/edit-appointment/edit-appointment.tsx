@@ -47,7 +47,7 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
       try {
       const appointment = await loadAppointment.load()
       let currentRestrictedDates = await loadRestrictedDates.loadDates()
-      const filteredDays = currentRestrictedDates.restrictedDays.filter((eachDay) => !isEqual(new Date(appointment.appointment_date), new Date(eachDay)))
+      const filteredDays = currentRestrictedDates.restrictedDays.filter((eachDay) => {!(appointment.appointment_date.substring(0, 10) === eachDay.substring(0, 10))})
       const filteredHours = currentRestrictedDates.restrictedHours.filter((eachHour) => !isEqual(new Date(appointment.appointment_date), new Date(eachHour)))
       currentRestrictedDates = {restrictedDays: filteredDays, restrictedHours: filteredHours}
       setCurrentAppointment(appointment)
@@ -64,7 +64,9 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
   function disabledDays (date) {
     let disabledDay = false
     restrictedDates.restrictedDays.forEach((actualDate) => {
-      disabledDay = isSameDay(new Date(date), new Date(actualDate))
+      if (actualDate.substring(0, 10) === date.toISOString().substring(0, 10)) {
+        disabledDay = true
+      }
     })
     return disabledDay
   }

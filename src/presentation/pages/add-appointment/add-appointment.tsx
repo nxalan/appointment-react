@@ -5,7 +5,7 @@ import { Footer, Header, Input, Button, FormStatus } from '@/presentation/compon
 import { AddAppointment, LoadRestrictedDates } from '@/domain/usecases'
 import { Formik, FormikHelpers, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { getHours, isSameDay, startOfHour } from 'date-fns'
+import { getDay, getHours, isSameDay, startOfDay, startOfHour } from 'date-fns'
 
 const AddAppointmentSchema = Yup.object().shape({
   name: Yup.string().required('Campo obrigatório'),
@@ -39,7 +39,9 @@ const AddAppointmentPage: React.FC<Props> = ({ addAppointment, loadRestrictedDat
   function disabledDays (date) {
     let disabledDay = false
     restrictedDates.restrictedDays.forEach((actualDate) => {
-      disabledDay = isSameDay(new Date(date), new Date(actualDate))
+      if (actualDate.substring(0, 10) === date.toISOString().substring(0, 10)) {
+        disabledDay = true
+      }
     })
     return disabledDay
   }
