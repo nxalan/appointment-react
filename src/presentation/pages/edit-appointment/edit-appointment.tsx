@@ -2,12 +2,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import * as Yup from 'yup'
 import { EditAppointment, LoadAppointment, LoadRestrictedDates } from '@/domain/usecases'
-import { Footer, Header, Input, Button, Snackbar } from '@/presentation/components'
+import { Footer, Header, Input, Button, Snackbar, Spinner } from '@/presentation/components'
 import { Formik, FormikHelpers, FormikProps } from 'formik'
 import Styles from './edit-appointment-styles.scss'
 import { Link } from 'react-router-dom'
 import { Divider } from '@mui/material'
 import { getHours, isEqual, isSameDay, startOfHour } from 'date-fns'
+import { useHistory } from 'react-router-dom'
 
 const EditAppointmentSchema = Yup.object().shape({
   birthday: Yup.date().typeError('Digite uma data válida').default(null),
@@ -38,10 +39,12 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
     status_comment: ''
   })
   const inputRef = useRef(null)
+  const history = useHistory()
 
   useEffect(() => {
     async function refreshAppointments() {
       setLoading(true)
+      try {
       const appointment = await loadAppointment.load()
       let currentRestrictedDates = await loadRestrictedDates.loadDates()
       const filteredDays = currentRestrictedDates.restrictedDays.filter((eachDay) => !isEqual(new Date(appointment.appointment_date), new Date(eachDay)))
@@ -49,7 +52,10 @@ const EditAppointmentPage: React.FC<Props> = ({ loadAppointment, editAppointment
       currentRestrictedDates = {restrictedDays: filteredDays, restrictedHours: filteredHours}
       setCurrentAppointment(appointment)
       setRestrictedDates(currentRestrictedDates)
-      setLoading(false)
+    } catch (error) {
+      history.push('/agendamento')
+    }
+    setLoading(false)
     }
     refreshAppointments()
   }, [refresh])
